@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS credit_request cascade;
+DROP TABLE IF EXISTS loyalty_program cascade;
+DROP TABLE IF EXISTS users cascade;
+DROP TABLE IF EXISTS card_tier cascade;
+DROP TABLE IF EXISTS loyalty_membership cascade;
+DROP TABLE IF EXISTS promotion cascade;
+DROP TYPE IF EXISTS promo_type_enum cascade;
+DROP TYPE IF EXISTS earn_rate_type_enum cascade;
+DROP TYPE IF EXISTS transaction_status_enum cascade;
