@@ -33,7 +33,6 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
     Program:int32(program.ID), 
   }
 
-  fmt.Println(getPromoParam)
   promotions,err :=query.GetPromotionByDateRange(c,getPromoParam)
   if err!=nil{
     return 0,err
@@ -45,10 +44,8 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
   }
   var results =[]float64{}
   var base float64= program.InitialEarnRate*body.CreditToTransfer
-  fmt.Println(promotions)
   for _,promotion := range promotions{
     var tempReward float64 = 0
-    fmt.Println(promotion)
     if (promotion.PromoType=="onetime" ){
       args:=models.GetCreditRequestByPromoParams {
         Program:int32(program.ID),
@@ -56,10 +53,10 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 
       }
       _,err= query.GetCreditRequestByPromo(c,args)
-      fmt.Println(err.Error())
 
       //skip the loop if there is result found
-      if err.Error()!="sql: no rows in result set"{
+      // if err.Error()!="sql: no rows in result set"{
+      if err!=sql.ErrNoRows{
         fmt.Println("no pass request made")
         continue
       }
@@ -69,11 +66,13 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
       if promotion.CardTier.Int32==user.CardTier.Int32{
         tempReward = processReward(promotion,base)
       }
+    }else if promotion.CardTier.Valid{
+      continue
+
     }else{
       tempReward = processReward(promotion,base)
 
     }
-    fmt.Println(tempReward)
 
     if tempReward!=0{
       results = append(results, tempReward)
