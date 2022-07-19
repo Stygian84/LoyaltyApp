@@ -41,7 +41,7 @@ func (store *Store) execTx(ctx context.Context,fn func(*Queries) error) error{
   return tx.Commit()
 }
 
-func (store *Store) CreditTransferOut(ctx context.Context,arg TransferParams) (CreditRequest,error){
+func (store *Store) CreditTransferOut(ctx context.Context,arg TransferParams,promo sql.NullInt32) (CreditRequest,error){
   var result CreditRequest
   err:= store.execTx(ctx, func (q *Queries)error{
     var err error
@@ -51,6 +51,7 @@ func (store *Store) CreditTransferOut(ctx context.Context,arg TransferParams) (C
       MemberID:arg.MembershipId,
       CreditUsed:arg.CreditToTransfer,
       RewardShouldReceive:arg.RewardShouldReceive,
+      PromoUsed:promo,
       TransactionTime:sql.NullTime{Time:time.Now(),Valid:true},
       TransactionStatus:TransactionStatusEnum("created"),
     }

@@ -22,6 +22,9 @@ func NewServer(store *models.Store) *Server{
 
   router.POST("/initTransaction",server.CreateTransaction)
   router.POST("/loyalty/validateMembership", server.CheckLoyaltyRegEx)
+  router.POST("/loyalty", server.CreateLoyaltyProg)
+  router.GET("/loyalty", server.GetLoyalty)
+  router.GET("/loyalty/:id", server.GetLoyaltyId)
   router.POST("/checkReward",server.CheckRewardRate)
   server.router=router
   return server

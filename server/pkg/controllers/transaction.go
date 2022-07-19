@@ -20,44 +20,42 @@ func processReward(promotion models.Promotion, base float64) float64 {
 	}
 }
 
-func CalculateReward(c context.Context, query *models.Queries, body models.TransferParams) (result float64, err error) {
+func CalculateReward(c context.Context, query *models.Queries, body models.TransferParams) (result float64, promoUsed sql.NullInt32, err error) {
 	if body.CreditToTransfer < 0 {
 		// return 0,error
 	}
 	program, err := query.GetLoyaltyByID(c, int64(body.ProgramId))
 	if err != nil {
-		return 0, err
+		return 0, sql.NullInt32{Valid: false}, nil
 	}
-
 	getPromoParam := models.GetPromotionByDateRangeParams{
 		Column1: time.Now().Format("2006-01-02"),
 		Program: int32(program.ID),
 	}
 
-	fmt.Println(getPromoParam)
 	promotions, err := query.GetPromotionByDateRange(c, getPromoParam)
 	if err != nil {
-		return 0, err
+		return 0, sql.NullInt32{Valid: false}, nil
 	}
 
 	user, err := query.GetUserByID(c, int64(body.UserId))
 	if err != nil {
-		return 0, err
+		return 0, sql.NullInt32{Valid: false}, nil
 	}
-	var results = []float64{}
 	var base float64 = program.InitialEarnRate * body.CreditToTransfer
-	fmt.Println(promotions)
+	var promoIdUsed int32 = 0
+	var max float64 = base
 	for _, promotion := range promotions {
 		var tempReward float64 = 0
-		fmt.Println(promotion)
 		if promotion.PromoType == "onetime" {
 			args := models.GetCreditRequestByPromoParams{
 				Program:   int32(program.ID),
 				PromoUsed: sql.NullInt32{Valid: true, Int32: int32(promotion.ID)},
 			}
 			_, err = query.GetCreditRequestByPromo(c, args)
-			fmt.Println(err)
+
 			//skip the loop if there is result found
+			// if err.Error()!="sql: no rows in result set"{
 			if err != sql.ErrNoRows {
 				fmt.Println("no pass request made")
 				continue
@@ -68,27 +66,26 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 			if promotion.CardTier.Int32 == user.CardTier.Int32 {
 				tempReward = processReward(promotion, base)
 			}
+		} else if promotion.CardTier.Valid {
+			continue
+
 		} else {
 			tempReward = processReward(promotion, base)
 
 		}
-		fmt.Println(tempReward)
 
 		if tempReward != 0 {
-			results = append(results, tempReward)
-		}
-	}
-	var max float64 = base
-	if len(results) > 0 {
-		max = results[0]
-		for i := 1; i < len(results); i++ {
-			if results[i] > max {
-				max = results[i]
+			if tempReward > max {
+				max = tempReward
+				promoIdUsed = int32(promotion.ID)
 			}
 		}
 	}
-	return max, nil
-
+	if promoIdUsed != 0 {
+		return max, sql.NullInt32{Int32: promoIdUsed, Valid: true}, nil
+	} else {
+		return max, sql.NullInt32{Valid: false}, nil
+	}
 }
 
 func (server *Server) CheckRewardRate(c *gin.Context) {
@@ -98,13 +95,12 @@ func (server *Server) CheckRewardRate(c *gin.Context) {
 		return
 	}
 
-	amount, err := CalculateReward(c, server.store.Queries, body)
+	amount, _, err := CalculateReward(c, server.store.Queries, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"Amount": amount})
-
 }
 
 func (server *Server) CreateTransaction(c *gin.Context) {
@@ -129,9 +125,10 @@ func (server *Server) CreateTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Membership not valid"})
 		return
 	}
-	body.RewardShouldReceive, err = CalculateReward(c, server.store.Queries, body)
+	var promoUsed sql.NullInt32
+	body.RewardShouldReceive, promoUsed, err = CalculateReward(c, server.store.Queries, body)
 
-	creditRequest, err := server.store.CreditTransferOut(c, body)
+	creditRequest, err := server.store.CreditTransferOut(c, body, promoUsed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
