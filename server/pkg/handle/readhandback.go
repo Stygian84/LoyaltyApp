@@ -45,7 +45,7 @@ func ReadHandbackFile() (err error) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		//column title = records [0]
+		// column title = records [0]
 		// transfer_date := records [1][2]
 		// amount := records [2][2]
 		reference_number := records[3][2]
@@ -60,7 +60,9 @@ func ReadHandbackFile() (err error) {
 		}
 
 		credit_request, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
-
+		if err != nil {
+			log.Fatal(err)
+		}
 		// int_outcome_code = 0 -> approved
 		// int_outcome_code = 1 -> rejected
 		if int_outcome_code == 0 {
@@ -87,7 +89,7 @@ func ReadHandbackFile() (err error) {
 
 			user_id := credit_details.UserID
 			credit_used := credit_details.CreditUsed
-			log.Printf("%f credits are refunded to USERID %v", credit_used, user_id)
+			log.Printf("%.2f credits are refunded to USERID %v", credit_used, user_id)
 			balanceargs := models.IncrBalanceParams{
 				CreditBalance: credit_used,
 				ID:            int64(user_id),
@@ -98,14 +100,13 @@ func ReadHandbackFile() (err error) {
 			}
 
 		}
-
-		//
-		_ = err
 		_ = credit_request
 	}
 
+	log.Println("Disconnecting from SFTP server ...")
 	conn.Close()
 	sc.Close()
+
 	return err
 
 }
