@@ -17,9 +17,6 @@ func ReadHandbackFile() (err error) {
 	Queries = models.New(config.GetDB())
 	conn, sc := ConnectToSFTP()
 
-	defer conn.Close()
-	defer sc.Close()
-
 	// List files in the remote handback directory .
 	theFiles, err := listFiles(*sc, "./handback")
 	if err != nil {
@@ -62,17 +59,43 @@ func ReadHandbackFile() (err error) {
 			log.Fatal(err)
 		}
 
-		log.Print(int_outcome_code)
-
 		credit_request, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
+
+		// int_outcome_code = 0 -> approved
+		// int_outcome_code = 1 -> rejected
 		if int_outcome_code == 0 {
 			// Update transaction status to approved
-			_ = Queries.UpdateTransactionStatus(context.Background(), "approved")
-			log.Print("Is Successfully Approved")
+			args := models.UpdateTransactionStatusByIDParams{
+				TransactionStatus: models.TransactionStatusEnumApproved,
+				ReferenceNumber:   int_reference_number,
+			}
+			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
+			log.Printf("Reference Number %v Is Successfully Approved", reference_number)
 		} else {
 			// Update transaction status to rejected
-			_ = Queries.UpdateTransactionStatus(context.Background(), "rejected")
-			log.Print("Is Successfully Rejected")
+			args := models.UpdateTransactionStatusByIDParams{
+				TransactionStatus: models.TransactionStatusEnumRejected,
+				ReferenceNumber:   int_reference_number,
+			}
+			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
+			log.Printf("Reference Number %v Is Successfully Rejected", reference_number)
+
+			credit_details, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			user_id := credit_details.UserID
+			credit_used := credit_details.CreditUsed
+			log.Printf("%f credits are refunded to USERID %v", credit_used, user_id)
+			balanceargs := models.IncrBalanceParams{
+				CreditBalance: credit_used,
+				ID:            int64(user_id),
+			}
+			err = Queries.IncrBalance(context.Background(), balanceargs)
+			if err != nil {
+				log.Fatal(err)
+			}
 
 		}
 
@@ -81,6 +104,8 @@ func ReadHandbackFile() (err error) {
 		_ = credit_request
 	}
 
+	conn.Close()
+	sc.Close()
 	return err
 
 }
