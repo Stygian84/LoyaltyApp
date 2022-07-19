@@ -12,16 +12,17 @@ import (
 
 const createCreditRequest = `-- name: CreateCreditRequest :one
 INSERT INTO credit_request(
-  user_id,program,member_id,transaction_time,
+  user_id,promo_used,program,member_id,transaction_time,
   credit_used,reward_should_receive,transaction_status
 ) VALUES (
-  $1, $2, $3, $4, $5, $6,$7
+  $1, $2, $3, $4, $5, $6,$7,$8
 )
 RETURNING reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status
 `
 
 type CreateCreditRequestParams struct {
 	UserID              int32                 `json:"user_id"`
+	PromoUsed           sql.NullInt32         `json:"promo_used"`
 	Program             int32                 `json:"program"`
 	MemberID            string                `json:"member_id"`
 	TransactionTime     sql.NullTime          `json:"transaction_time"`
@@ -33,6 +34,7 @@ type CreateCreditRequestParams struct {
 func (q *Queries) CreateCreditRequest(ctx context.Context, arg CreateCreditRequestParams) (CreditRequest, error) {
 	row := q.db.QueryRowContext(ctx, createCreditRequest,
 		arg.UserID,
+		arg.PromoUsed,
 		arg.Program,
 		arg.MemberID,
 		arg.TransactionTime,
@@ -252,8 +254,9 @@ member_id = COALESCE($3,member_id),
 transaction_time = COALESCE($4,transaction_time),
 credit_used = COALESCE($5,credit_used),
 reward_should_receive = COALESCE($6,reward_should_receive),
-transaction_status = COALESCE($7,transaction_status)
-WHERE reference_number = $8
+transaction_status = COALESCE($7,transaction_status),
+promo_used = COALESCE($8,promo_used)
+WHERE reference_number = $9
 `
 
 type UpdateCreditRequestParams struct {
@@ -264,6 +267,7 @@ type UpdateCreditRequestParams struct {
 	CreditUsed          float64               `json:"credit_used"`
 	RewardShouldReceive float64               `json:"reward_should_receive"`
 	TransactionStatus   TransactionStatusEnum `json:"transaction_status"`
+	PromoUsed           sql.NullInt32         `json:"promo_used"`
 	ReferenceNumber     int64                 `json:"reference_number"`
 }
 
@@ -276,6 +280,7 @@ func (q *Queries) UpdateCreditRequest(ctx context.Context, arg UpdateCreditReque
 		arg.CreditUsed,
 		arg.RewardShouldReceive,
 		arg.TransactionStatus,
+		arg.PromoUsed,
 		arg.ReferenceNumber,
 	)
 	return err

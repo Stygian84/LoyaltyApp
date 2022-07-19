@@ -21,10 +21,10 @@ ORDER BY program;
 
 -- name: CreateCreditRequest :one
 INSERT INTO credit_request(
-  user_id,program,member_id,transaction_time,
+  user_id,promo_used,program,member_id,transaction_time,
   credit_used,reward_should_receive,transaction_status
 ) VALUES (
-  $1, $2, $3, $4, $5, $6,$7
+  $1, $2, $3, $4, $5, $6,$7,$8
 )
 RETURNING *;
 
@@ -40,8 +40,9 @@ member_id = COALESCE($3,member_id),
 transaction_time = COALESCE($4,transaction_time),
 credit_used = COALESCE($5,credit_used),
 reward_should_receive = COALESCE($6,reward_should_receive),
-transaction_status = COALESCE($7,transaction_status)
-WHERE reference_number = $8;
+transaction_status = COALESCE($7,transaction_status),
+promo_used = COALESCE($8,promo_used)
+WHERE reference_number = $9;
 
 -- name: DeleteCreditRequest :exec
 DELETE FROM credit_request

@@ -3,6 +3,7 @@ package controllers
 import(
   "github.com/gin-gonic/gin"
   "net/http"
+  "strconv"
   "esc/ascendaRoyaltyPoint/pkg/models"
 )
 func(server *Server)CreateLoyaltyProg(c *gin.Context){
@@ -26,8 +27,20 @@ func (server *Server) GetLoyalty(c *gin.Context){
 		return
   }
   c.JSON(http.StatusCreated,progs)
-
-
-
 }
+func (server *Server) GetLoyaltyId(c *gin.Context){
+  id,err := strconv.Atoi(c.Param("id"))
+  if err!=nil{
+    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+  }
+  
+  prog,err:=server.store.Queries.GetLoyaltyByID(c,int64(id))
+  if err!=nil{
+    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+  }
+  c.JSON(http.StatusCreated,prog)
+}
+
 

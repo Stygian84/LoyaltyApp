@@ -19,13 +19,13 @@ func processReward (promotion models.Promotion,base float64) float64{
   }
 }
 
-func CalculateReward(c context.Context, query *models.Queries, body models.TransferParams)(result float64 ,err error){
+func CalculateReward(c context.Context, query *models.Queries, body models.TransferParams)(result float64 ,promoUsed sql.NullInt32,err error){
   if body.CreditToTransfer<0{
     // return 0,error
   }
   program,err:= query.GetLoyaltyByID(c,int64(body.ProgramId))
   if err!=nil{
-		return 0,err
+		return 0,sql.NullInt32{Valid: false},nil
   }
 
   getPromoParam := models.GetPromotionByDateRangeParams{
@@ -35,15 +35,16 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 
   promotions,err :=query.GetPromotionByDateRange(c,getPromoParam)
   if err!=nil{
-    return 0,err
+		return 0,sql.NullInt32{Valid: false},nil
   }
 
   user ,err := query.GetUserByID(c,int64(body.UserId))
   if err!=nil{
-    return 0,err
+		return 0,sql.NullInt32{Valid: false},nil
   }
-  var results =[]float64{}
   var base float64= program.InitialEarnRate*body.CreditToTransfer
+  var promoIdUsed int32 = 0
+  var max float64=base
   for _,promotion := range promotions{
     var tempReward float64 = 0
     if (promotion.PromoType=="onetime" ){
@@ -75,19 +76,18 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
     }
 
     if tempReward!=0{
-      results = append(results, tempReward)
-    }
-  } 
-  var max float64=base
-  if len(results)>0{
-    max = results[0]
-    for i:=1;i<len(results);i++{
-      if results[i]>max{
-        max = results[i]
+      if tempReward>max{
+        max=tempReward
+        promoIdUsed=int32(promotion.ID)
       }
     }
+  } 
+  if promoIdUsed!=0{
+    return max,sql.NullInt32{Int32:promoIdUsed,Valid:true},nil
+  }else{
+    return max,sql.NullInt32{Valid:false},nil
   }
-  return max,nil
+
 
 
 }
@@ -99,7 +99,7 @@ func (server *Server) CheckRewardRate(c *gin.Context){
 		return
   }
   
-  amount,err:=CalculateReward(c,server.store.Queries,body)
+  amount,_,err:=CalculateReward(c,server.store.Queries,body)
   if err!=nil{
     c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
     return
@@ -132,9 +132,10 @@ func (server *Server)CreateTransaction(c *gin.Context){
     c.JSON(http.StatusBadRequest,gin.H{"error":"Membership not valid"})
     return
   }
-  body.RewardShouldReceive,err = CalculateReward(c,server.store.Queries,body)
+  var promoUsed sql.NullInt32
+  body.RewardShouldReceive,promoUsed,err = CalculateReward(c,server.store.Queries,body)
 	
-	creditRequest,err := server.store.CreditTransferOut(c,body)
+	creditRequest,err := server.store.CreditTransferOut(c,body,promoUsed)
 	if err!=nil{
     c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
     return
