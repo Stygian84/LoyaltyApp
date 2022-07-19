@@ -28,9 +28,10 @@ INSERT INTO credit_request(
 )
 RETURNING *;
 
--- name: UpdateTransactionStatus :exec
+-- name: UpdateTransactionStatusByID :exec
 UPDATE credit_request
-SET transaction_status = $1;
+SET transaction_status = $1
+WHERE reference_number = $1 LIMIT 1;
 
 -- name: UpdateCreditRequest :exec
 UPDATE credit_request 
