@@ -76,13 +76,15 @@ type CardTier struct {
 }
 
 type CreditRequest struct {
-	ReferenceNumber   int64                 `json:"reference_number"`
-	UserID            int32                 `json:"user_id"`
-	Program           int32                 `json:"program"`
-	MemberID          string                `json:"member_id"`
-	TransactionTime   sql.NullTime          `json:"transaction_time"`
-	Amount            float64               `json:"amount"`
-	TransactionStatus TransactionStatusEnum `json:"transaction_status"`
+	ReferenceNumber     int64                 `json:"reference_number"`
+	UserID              int32                 `json:"user_id"`
+	Program             int32                 `json:"program"`
+	MemberID            string                `json:"member_id"`
+	TransactionTime     sql.NullTime          `json:"transaction_time"`
+	CreditUsed          float64               `json:"credit_used"`
+	RewardShouldReceive float64               `json:"reward_should_receive"`
+	PromoUsed           sql.NullInt32         `json:"promo_used"`
+	TransactionStatus   TransactionStatusEnum `json:"transaction_status"`
 }
 
 type LoyaltyMembership struct {

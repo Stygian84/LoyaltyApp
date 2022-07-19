@@ -10,6 +10,11 @@ WHERE user_id = $1;
 SELECT * FROM credit_request
 WHERE program = $1; 
 
+-- name: GetCreditRequestByPromo :many
+SELECT * FROM credit_request
+WHERE program = $1 AND promo_used=$2 ; 
+
+
 -- name: ListCreditRequest :many
 SELECT * FROM credit_request
 ORDER BY program;
@@ -17,11 +22,15 @@ ORDER BY program;
 -- name: CreateCreditRequest :one
 INSERT INTO credit_request(
   user_id,program,member_id,transaction_time,
-  amount,transaction_status
+  credit_used,reward_should_receive,transaction_status
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4, $5, $6,$7
 )
 RETURNING *;
+
+-- name: UpdateTransactionStatus :exec
+UPDATE credit_request
+SET transaction_status = $1;
 
 -- name: UpdateCreditRequest :exec
 UPDATE credit_request 
@@ -29,9 +38,10 @@ SET user_id = COALESCE($1,user_id),
 program = COALESCE($2,program),
 member_id = COALESCE($3,member_id),
 transaction_time = COALESCE($4,transaction_time),
-amount = COALESCE($5,amount),
-transaction_status = COALESCE($6,transaction_status)
-WHERE reference_number = $7;
+credit_used = COALESCE($5,credit_used),
+reward_should_receive = COALESCE($6,reward_should_receive),
+transaction_status = COALESCE($7,transaction_status)
+WHERE reference_number = $8;
 
 -- name: DeleteCreditRequest :exec
 DELETE FROM credit_request

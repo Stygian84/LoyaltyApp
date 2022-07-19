@@ -116,6 +116,18 @@ func (q *Queries) GetLoyaltyByName(ctx context.Context, name string) (LoyaltyPro
 	return i, err
 }
 
+const getRegEx = `-- name: GetRegEx :one
+SELECT format_regex FROM loyalty_program
+WHere id = $1
+`
+
+func (q *Queries) GetRegEx(ctx context.Context, id int64) (string, error) {
+	row := q.db.QueryRowContext(ctx, getRegEx, id)
+	var format_regex string
+	err := row.Scan(&format_regex)
+	return format_regex, err
+}
+
 const listLoyalty = `-- name: ListLoyalty :many
 SELECT id, name, currency_name, processing_time, description, enrollment_link, terms_condition_link, format_regex, partner_code, initial_earn_rate FROM loyalty_program
 ORDER BY name

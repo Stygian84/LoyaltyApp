@@ -19,17 +19,17 @@ CREATE TABLE "users" (
   "id" bigserial PRIMARY KEY,
   "full_name" varchar,
   "credit_balance" float NOT NULL,
-  "email" varchar NOT NULL UNIQUE,
+  "email" varchar UNIQUE NOT NULL,
   "contact" int UNIQUE,
   "password" varchar NOT NULL,
-  "user_name" varchar NOT NULL UNIQUE,
+  "user_name" varchar UNIQUE NOT NULL,
   "card_tier" int,
   "created_at" timestamp
 );
 
 CREATE TABLE "card_tier" (
   "id" bigserial PRIMARY KEY,
-  "name" varchar NOT NULL UNIQUE,
+  "name" varchar UNIQUE NOT NULL,
   "tier" int NOT NULL
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE "loyalty_program" (
 CREATE TABLE "loyalty_membership" (
   "id" bigserial PRIMARY KEY,
   "program" int NOT NULL,
-  "name" varchar NOT NULL UNIQUE
+  "name" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE "promotion" (
@@ -70,10 +70,11 @@ CREATE TABLE "credit_request" (
   "program" int NOT NULL,
   "member_id" varchar NOT NULL,
   "transaction_time" timestamp DEFAULT (now()),
-  "amount" float NOT NULL,
+  "credit_used" float NOT NULL,
+  "reward_should_receive" float NOT NULL,
+  "promo_used" int,
   "transaction_status" transaction_status_enum
 );
-
 
 CREATE INDEX ON "users" ("user_name");
 
@@ -95,8 +96,9 @@ CREATE INDEX ON "credit_request" ("user_id");
 
 CREATE INDEX ON "credit_request" ("program");
 
-
 ALTER TABLE "users" ADD FOREIGN KEY ("card_tier") REFERENCES "card_tier" ("id");
+
+ALTER TABLE "credit_request" ADD FOREIGN KEY ("promo_used") REFERENCES "promotion" ("id");
 
 ALTER TABLE "loyalty_membership" ADD FOREIGN KEY ("program") REFERENCES "loyalty_program" ("id");
 
@@ -109,4 +111,3 @@ ALTER TABLE "promotion" ADD FOREIGN KEY ("loyalty_membership") REFERENCES "loyal
 ALTER TABLE "credit_request" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "credit_request" ADD FOREIGN KEY ("program") REFERENCES "loyalty_program" ("id");
-

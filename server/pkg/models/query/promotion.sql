@@ -9,7 +9,7 @@ WHERE program = $1;
 
 -- name: GetPromotionByDateRange :many
 SELECT * FROM promotion
-WHERE $1 >= start_date AND $1 <= end_date;
+WHERE $1 >= start_date AND $1 <= end_date AND program=$2;
 
 -- name: ListPromotion :many
 SELECT * FROM promotion
@@ -23,6 +23,7 @@ INSERT INTO promotion(
   $1, $2, $3, $4, $5, $6, $7, $8
 )
 RETURNING *;
+
 
 -- name: UpdatePromotion :exec
 UPDATE promotion 

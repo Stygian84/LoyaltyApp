@@ -33,6 +33,18 @@ INSERT INTO users(
 )
 RETURNING *;
 
+-- name: DecreBalance :exec
+UPDATE users 
+SET credit_balance = credit_balance-$1 
+WHERE id=$2 and credit_balance>=$1;
+
+-- name: IncrBalance :exec
+UPDATE users 
+SET credit_balance = credit_balance+$1 
+WHERE id=$2;
+
+
+
 -- name: UpdateUser :exec
 UPDATE users 
 SET full_name = COALESCE($1,full_name),

@@ -28,6 +28,8 @@ go.work
 /vendor/
 /Godeps/
 
+.DS_Store
+
 #env
 .env
 

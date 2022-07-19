@@ -70,11 +70,16 @@ func (q *Queries) DeletePromotion(ctx context.Context, id int64) error {
 
 const getPromotionByDateRange = `-- name: GetPromotionByDateRange :many
 SELECT id, program, promo_type, start_date, end_date, earn_rate_type, constant, card_tier, loyalty_membership FROM promotion
-WHERE $1 >= start_date AND $1 <= end_date
+WHERE $1 >= start_date AND $1 <= end_date AND program=$2
 `
 
-func (q *Queries) GetPromotionByDateRange(ctx context.Context, dollar_1 interface{}) ([]Promotion, error) {
-	rows, err := q.db.QueryContext(ctx, getPromotionByDateRange, dollar_1)
+type GetPromotionByDateRangeParams struct {
+	Column1 interface{} `json:"column_1"`
+	Program int32       `json:"program"`
+}
+
+func (q *Queries) GetPromotionByDateRange(ctx context.Context, arg GetPromotionByDateRangeParams) ([]Promotion, error) {
+	rows, err := q.db.QueryContext(ctx, getPromotionByDateRange, arg.Column1, arg.Program)
 	if err != nil {
 		return nil, err
 	}

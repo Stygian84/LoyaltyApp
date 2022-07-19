@@ -20,6 +20,10 @@ INSERT INTO loyalty_program(
 )
 RETURNING *;
 
+-- name: GetRegEx :one
+SELECT format_regex FROM loyalty_program
+WHere id = $1;
+
 -- name: UpdateLoyalty :one
 UPDATE loyalty_program 
 SET name = COALESCE($1,name),

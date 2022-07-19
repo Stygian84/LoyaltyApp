@@ -55,6 +55,22 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const decreBalance = `-- name: DecreBalance :exec
+UPDATE users 
+SET credit_balance = credit_balance-$1 
+WHERE id=$2 and credit_balance>=$1
+`
+
+type DecreBalanceParams struct {
+	CreditBalance float64 `json:"credit_balance"`
+	ID            int64   `json:"id"`
+}
+
+func (q *Queries) DecreBalance(ctx context.Context, arg DecreBalanceParams) error {
+	_, err := q.db.ExecContext(ctx, decreBalance, arg.CreditBalance, arg.ID)
+	return err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1
@@ -221,6 +237,22 @@ func (q *Queries) GetUserByUserName(ctx context.Context, userName string) (User,
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const incrBalance = `-- name: IncrBalance :exec
+UPDATE users 
+SET credit_balance = credit_balance+$1 
+WHERE id=$2
+`
+
+type IncrBalanceParams struct {
+	CreditBalance float64 `json:"credit_balance"`
+	ID            int64   `json:"id"`
+}
+
+func (q *Queries) IncrBalance(ctx context.Context, arg IncrBalanceParams) error {
+	_, err := q.db.ExecContext(ctx, incrBalance, arg.CreditBalance, arg.ID)
+	return err
 }
 
 const listUsers = `-- name: ListUsers :many

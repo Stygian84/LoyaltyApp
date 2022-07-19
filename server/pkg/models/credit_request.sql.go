@@ -13,20 +13,21 @@ import (
 const createCreditRequest = `-- name: CreateCreditRequest :one
 INSERT INTO credit_request(
   user_id,program,member_id,transaction_time,
-  amount,transaction_status
+  credit_used,reward_should_receive,transaction_status
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4, $5, $6,$7
 )
-RETURNING reference_number, user_id, program, member_id, transaction_time, amount, transaction_status
+RETURNING reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status
 `
 
 type CreateCreditRequestParams struct {
-	UserID            int32                 `json:"user_id"`
-	Program           int32                 `json:"program"`
-	MemberID          string                `json:"member_id"`
-	TransactionTime   sql.NullTime          `json:"transaction_time"`
-	Amount            float64               `json:"amount"`
-	TransactionStatus TransactionStatusEnum `json:"transaction_status"`
+	UserID              int32                 `json:"user_id"`
+	Program             int32                 `json:"program"`
+	MemberID            string                `json:"member_id"`
+	TransactionTime     sql.NullTime          `json:"transaction_time"`
+	CreditUsed          float64               `json:"credit_used"`
+	RewardShouldReceive float64               `json:"reward_should_receive"`
+	TransactionStatus   TransactionStatusEnum `json:"transaction_status"`
 }
 
 func (q *Queries) CreateCreditRequest(ctx context.Context, arg CreateCreditRequestParams) (CreditRequest, error) {
@@ -35,7 +36,8 @@ func (q *Queries) CreateCreditRequest(ctx context.Context, arg CreateCreditReque
 		arg.Program,
 		arg.MemberID,
 		arg.TransactionTime,
-		arg.Amount,
+		arg.CreditUsed,
+		arg.RewardShouldReceive,
 		arg.TransactionStatus,
 	)
 	var i CreditRequest
@@ -45,7 +47,9 @@ func (q *Queries) CreateCreditRequest(ctx context.Context, arg CreateCreditReque
 		&i.Program,
 		&i.MemberID,
 		&i.TransactionTime,
-		&i.Amount,
+		&i.CreditUsed,
+		&i.RewardShouldReceive,
+		&i.PromoUsed,
 		&i.TransactionStatus,
 	)
 	return i, err
@@ -62,7 +66,7 @@ func (q *Queries) DeleteCreditRequest(ctx context.Context, referenceNumber int64
 }
 
 const getCreditRequestByID = `-- name: GetCreditRequestByID :one
-SELECT reference_number, user_id, program, member_id, transaction_time, amount, transaction_status FROM credit_request
+SELECT reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status FROM credit_request
 WHERE reference_number = $1 LIMIT 1
 `
 
@@ -75,14 +79,16 @@ func (q *Queries) GetCreditRequestByID(ctx context.Context, referenceNumber int6
 		&i.Program,
 		&i.MemberID,
 		&i.TransactionTime,
-		&i.Amount,
+		&i.CreditUsed,
+		&i.RewardShouldReceive,
+		&i.PromoUsed,
 		&i.TransactionStatus,
 	)
 	return i, err
 }
 
 const getCreditRequestByProg = `-- name: GetCreditRequestByProg :many
-SELECT reference_number, user_id, program, member_id, transaction_time, amount, transaction_status FROM credit_request
+SELECT reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status FROM credit_request
 WHERE program = $1
 `
 
@@ -101,7 +107,52 @@ func (q *Queries) GetCreditRequestByProg(ctx context.Context, program int32) ([]
 			&i.Program,
 			&i.MemberID,
 			&i.TransactionTime,
-			&i.Amount,
+			&i.CreditUsed,
+			&i.RewardShouldReceive,
+			&i.PromoUsed,
+			&i.TransactionStatus,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCreditRequestByPromo = `-- name: GetCreditRequestByPromo :many
+SELECT reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status FROM credit_request
+WHERE program = $1 AND promo_used=$2
+`
+
+type GetCreditRequestByPromoParams struct {
+	Program   int32         `json:"program"`
+	PromoUsed sql.NullInt32 `json:"promo_used"`
+}
+
+func (q *Queries) GetCreditRequestByPromo(ctx context.Context, arg GetCreditRequestByPromoParams) ([]CreditRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getCreditRequestByPromo, arg.Program, arg.PromoUsed)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CreditRequest
+	for rows.Next() {
+		var i CreditRequest
+		if err := rows.Scan(
+			&i.ReferenceNumber,
+			&i.UserID,
+			&i.Program,
+			&i.MemberID,
+			&i.TransactionTime,
+			&i.CreditUsed,
+			&i.RewardShouldReceive,
+			&i.PromoUsed,
 			&i.TransactionStatus,
 		); err != nil {
 			return nil, err
@@ -118,7 +169,7 @@ func (q *Queries) GetCreditRequestByProg(ctx context.Context, program int32) ([]
 }
 
 const getCreditRequestByUser = `-- name: GetCreditRequestByUser :many
-SELECT reference_number, user_id, program, member_id, transaction_time, amount, transaction_status FROM credit_request
+SELECT reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status FROM credit_request
 WHERE user_id = $1
 `
 
@@ -137,7 +188,9 @@ func (q *Queries) GetCreditRequestByUser(ctx context.Context, userID int32) ([]C
 			&i.Program,
 			&i.MemberID,
 			&i.TransactionTime,
-			&i.Amount,
+			&i.CreditUsed,
+			&i.RewardShouldReceive,
+			&i.PromoUsed,
 			&i.TransactionStatus,
 		); err != nil {
 			return nil, err
@@ -154,7 +207,7 @@ func (q *Queries) GetCreditRequestByUser(ctx context.Context, userID int32) ([]C
 }
 
 const listCreditRequest = `-- name: ListCreditRequest :many
-SELECT reference_number, user_id, program, member_id, transaction_time, amount, transaction_status FROM credit_request
+SELECT reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status FROM credit_request
 ORDER BY program
 `
 
@@ -173,7 +226,9 @@ func (q *Queries) ListCreditRequest(ctx context.Context) ([]CreditRequest, error
 			&i.Program,
 			&i.MemberID,
 			&i.TransactionTime,
-			&i.Amount,
+			&i.CreditUsed,
+			&i.RewardShouldReceive,
+			&i.PromoUsed,
 			&i.TransactionStatus,
 		); err != nil {
 			return nil, err
@@ -195,19 +250,21 @@ SET user_id = COALESCE($1,user_id),
 program = COALESCE($2,program),
 member_id = COALESCE($3,member_id),
 transaction_time = COALESCE($4,transaction_time),
-amount = COALESCE($5,amount),
-transaction_status = COALESCE($6,transaction_status)
-WHERE reference_number = $7
+credit_used = COALESCE($5,credit_used),
+reward_should_receive = COALESCE($6,reward_should_receive),
+transaction_status = COALESCE($7,transaction_status)
+WHERE reference_number = $8
 `
 
 type UpdateCreditRequestParams struct {
-	UserID            int32                 `json:"user_id"`
-	Program           int32                 `json:"program"`
-	MemberID          string                `json:"member_id"`
-	TransactionTime   sql.NullTime          `json:"transaction_time"`
-	Amount            float64               `json:"amount"`
-	TransactionStatus TransactionStatusEnum `json:"transaction_status"`
-	ReferenceNumber   int64                 `json:"reference_number"`
+	UserID              int32                 `json:"user_id"`
+	Program             int32                 `json:"program"`
+	MemberID            string                `json:"member_id"`
+	TransactionTime     sql.NullTime          `json:"transaction_time"`
+	CreditUsed          float64               `json:"credit_used"`
+	RewardShouldReceive float64               `json:"reward_should_receive"`
+	TransactionStatus   TransactionStatusEnum `json:"transaction_status"`
+	ReferenceNumber     int64                 `json:"reference_number"`
 }
 
 func (q *Queries) UpdateCreditRequest(ctx context.Context, arg UpdateCreditRequestParams) error {
@@ -216,9 +273,20 @@ func (q *Queries) UpdateCreditRequest(ctx context.Context, arg UpdateCreditReque
 		arg.Program,
 		arg.MemberID,
 		arg.TransactionTime,
-		arg.Amount,
+		arg.CreditUsed,
+		arg.RewardShouldReceive,
 		arg.TransactionStatus,
 		arg.ReferenceNumber,
 	)
+	return err
+}
+
+const updateTransactionStatus = `-- name: UpdateTransactionStatus :exec
+UPDATE credit_request
+SET transaction_status = $1
+`
+
+func (q *Queries) UpdateTransactionStatus(ctx context.Context, transactionStatus TransactionStatusEnum) error {
+	_, err := q.db.ExecContext(ctx, updateTransactionStatus, transactionStatus)
 	return err
 }

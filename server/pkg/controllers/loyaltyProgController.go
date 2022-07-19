@@ -13,13 +13,13 @@ var CreateLoyalty = func(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	prog.CreateLoyaltyProgram()
+	// prog.CreateLoyaltyProgram()
 	c.JSON(http.StatusCreated,prog)
 
 
 }
 var GetLoyalty = func (c *gin.Context){
-  progs := models.GetAllProg()
-  c.JSON(http.StatusOK,progs)
+  // progs := models.GetAllProg()
+  // c.JSON(http.StatusOK,progs)
 }
 
