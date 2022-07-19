@@ -286,12 +286,18 @@ func (q *Queries) UpdateCreditRequest(ctx context.Context, arg UpdateCreditReque
 	return err
 }
 
-const updateTransactionStatus = `-- name: UpdateTransactionStatus :exec
+const updateTransactionStatusByID = `-- name: UpdateTransactionStatusByID :exec
 UPDATE credit_request
 SET transaction_status = $1
+WHERE reference_number = $2
 `
 
-func (q *Queries) UpdateTransactionStatus(ctx context.Context, transactionStatus TransactionStatusEnum) error {
-	_, err := q.db.ExecContext(ctx, updateTransactionStatus, transactionStatus)
+type UpdateTransactionStatusByIDParams struct {
+	TransactionStatus TransactionStatusEnum `json:"transaction_status"`
+	ReferenceNumber   int64                 `json:"reference_number"`
+}
+
+func (q *Queries) UpdateTransactionStatusByID(ctx context.Context, arg UpdateTransactionStatusByIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateTransactionStatusByID, arg.TransactionStatus, arg.ReferenceNumber)
 	return err
 }

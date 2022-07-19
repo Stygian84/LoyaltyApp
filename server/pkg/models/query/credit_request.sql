@@ -31,7 +31,7 @@ RETURNING *;
 -- name: UpdateTransactionStatusByID :exec
 UPDATE credit_request
 SET transaction_status = $1
-WHERE reference_number = $1 LIMIT 1;
+WHERE reference_number = $2 ;
 
 -- name: UpdateCreditRequest :exec
 UPDATE credit_request 
