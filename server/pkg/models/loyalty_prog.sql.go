@@ -7,7 +7,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createLoyalty = `-- name: CreateLoyalty :one
@@ -21,15 +20,15 @@ RETURNING id, name, currency_name, processing_time, description, enrollment_link
 `
 
 type CreateLoyaltyParams struct {
-	Name               string         `json:"name"`
-	CurrencyName       string         `json:"currency_name"`
-	ProcessingTime     string         `json:"processing_time"`
-	Description        sql.NullString `json:"description"`
-	EnrollmentLink     string         `json:"enrollment_link"`
-	TermsConditionLink string         `json:"terms_condition_link"`
-	FormatRegex        string         `json:"format_regex"`
-	PartnerCode        string         `json:"partner_code"`
-	InitialEarnRate    float64        `json:"initial_earn_rate"`
+	Name               string  `json:"name"`
+	CurrencyName       string  `json:"currency_name"`
+	ProcessingTime     string  `json:"processing_time"`
+	Description        string  `json:"description"`
+	EnrollmentLink     string  `json:"enrollment_link"`
+	TermsConditionLink string  `json:"terms_condition_link"`
+	FormatRegex        string  `json:"format_regex"`
+	PartnerCode        string  `json:"partner_code"`
+	InitialEarnRate    float64 `json:"initial_earn_rate"`
 }
 
 func (q *Queries) CreateLoyalty(ctx context.Context, arg CreateLoyaltyParams) (LoyaltyProgram, error) {
@@ -183,16 +182,16 @@ RETURNING id, name, currency_name, processing_time, description, enrollment_link
 `
 
 type UpdateLoyaltyParams struct {
-	Name               string         `json:"name"`
-	CurrencyName       string         `json:"currency_name"`
-	ProcessingTime     string         `json:"processing_time"`
-	Description        sql.NullString `json:"description"`
-	EnrollmentLink     string         `json:"enrollment_link"`
-	TermsConditionLink string         `json:"terms_condition_link"`
-	FormatRegex        string         `json:"format_regex"`
-	PartnerCode        string         `json:"partner_code"`
-	InitialEarnRate    float64        `json:"initial_earn_rate"`
-	ID                 int64          `json:"id"`
+	Name               string  `json:"name"`
+	CurrencyName       string  `json:"currency_name"`
+	ProcessingTime     string  `json:"processing_time"`
+	Description        string  `json:"description"`
+	EnrollmentLink     string  `json:"enrollment_link"`
+	TermsConditionLink string  `json:"terms_condition_link"`
+	FormatRegex        string  `json:"format_regex"`
+	PartnerCode        string  `json:"partner_code"`
+	InitialEarnRate    float64 `json:"initial_earn_rate"`
+	ID                 int64   `json:"id"`
 }
 
 func (q *Queries) UpdateLoyalty(ctx context.Context, arg UpdateLoyaltyParams) (LoyaltyProgram, error) {
