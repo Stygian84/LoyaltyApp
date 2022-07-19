@@ -20,6 +20,9 @@ func processReward (promotion models.Promotion,base float64) float64{
 }
 
 func CalculateReward(c context.Context, query *models.Queries, body models.TransferParams)(result float64 ,err error){
+  if body.CreditToTransfer<0{
+    // return 0,error
+  }
   program,err:= query.GetLoyaltyByID(c,int64(body.ProgramId))
   if err!=nil{
 		return 0,err

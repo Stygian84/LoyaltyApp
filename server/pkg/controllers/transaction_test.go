@@ -35,15 +35,17 @@ func createUserObject(carTier sql.NullInt32)models.CreateUserParams{
   }
   return arg
 }
-// add with onetime promo
-// multiple promotion
-// multiply onetime promo
-// multiply ongoing
+// add with onetime promo: kangming
+// multiple promotion :kangming
+// multiply onetime promo :nicholas
+// multiply ongoing:nicholas
 // add when no promo
 // multiply when no promo
-// add when there is a cardtier requirement for promo
-// multiply when there is a cardtier requirement for promo
+// add when there is a cardtier requirement for promo:kangming
+// multiply when there is a cardtier requirement for promo:nicholas
 // when promo ask for cartier but use no cardtier/ user's cardtier is below what is requested
+// promo date range outside today's date
+
 
 
 
