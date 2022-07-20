@@ -2,6 +2,7 @@ package controllers
 
 import(
   "esc/ascendaRoyaltyPoint/pkg/models"
+  "github.com/gin-contrib/cors"
   "github.com/gin-gonic/gin"
 )
 type Server struct{
@@ -20,6 +21,9 @@ func NewServer(store *models.Store) *Server{
   }
   router := gin.Default()
 
+  config := cors.DefaultConfig()
+  config.AllowAllOrigins = true
+  router.Use(cors.New(config))
   router.POST("/initTransaction",server.CreateTransaction)
   router.POST("/loyalty/validateMembership", server.CheckLoyaltyRegEx)
   router.POST("/loyalty", server.CreateLoyaltyProg)
