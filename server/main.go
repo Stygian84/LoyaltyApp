@@ -3,6 +3,7 @@ package main
 import (
 	"esc/ascendaRoyaltyPoint/pkg/config"
 	"esc/ascendaRoyaltyPoint/pkg/handle"
+	"log"
 )
 
 func main() {
@@ -14,5 +15,7 @@ func main() {
 	// if err!=nil{
 	//   log.Fatal("cannot start server",err)
 	// }
-	handle.ReadHandbackFile()
+	//err := handle.ReadHandbackFile()
+	err := handle.SendAccrual()
+	log.Fatal(err)
 }

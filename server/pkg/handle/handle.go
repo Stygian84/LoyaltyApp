@@ -25,7 +25,7 @@ const (
 
 var UploadAccrual = func() {
 
-	theFiles, err := ioutil.ReadDir("./files/accrual")
+	theFiles, err := ioutil.ReadDir("./temp/")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,12 +37,10 @@ var UploadAccrual = func() {
 	}
 
 	for _, theFile := range theFiles {
-
 		conn, sc := ConnectToSFTP()
-
 		// Upload local file to remote file
 		remoteFile := "./accrual/" + fmt.Sprint(theFile.Name())
-		localFile := "./files/accrual/" + fmt.Sprint(theFile.Name())
+		localFile := "./temp/" + fmt.Sprint(theFile.Name())
 
 		err = uploadFile(*sc, localFile, remoteFile)
 		if err != nil {
@@ -51,11 +49,11 @@ var UploadAccrual = func() {
 
 		conn.Close()
 		sc.Close()
-	}
 
+	}
+	os.RemoveAll("/temp/")
 	log.Printf("All files are uploaded successfully")
 
-	return
 }
 
 var DownloadHandback = func() {
@@ -140,7 +138,6 @@ func uploadFile(sc sftp.Client, localFile, remoteFile string) (err error) {
 	if err != nil {
 		return fmt.Errorf("Unable to open local file: %v", err)
 	}
-	defer srcFile.Close()
 
 	// Make remote directories recursion
 	parent := filepath.Dir(remoteFile)
@@ -155,7 +152,6 @@ func uploadFile(sc sftp.Client, localFile, remoteFile string) (err error) {
 	if err != nil {
 		return fmt.Errorf("Unable to open remote file: %v", err)
 	}
-	defer dstFile.Close()
 
 	bytes, err := io.Copy(dstFile, srcFile)
 	if err != nil {
@@ -163,7 +159,8 @@ func uploadFile(sc sftp.Client, localFile, remoteFile string) (err error) {
 	}
 	_ = bytes // to avoid declared and not used error
 	//log.Printf("%d bytes copied", bytes)
-
+	dstFile.Close()
+	srcFile.Close()
 	return nil
 }
 
@@ -211,7 +208,7 @@ func ConnectToSFTP() (*ssh.Client, *sftp.Client) {
 	// Parse Host and Port
 	host := parsedUrl.Host
 
-	log.Printf("Connecting to %s ...\n", host)
+	//log.Printf("Connecting to %s ...\n", host)
 
 	var auths []ssh.AuthMethod
 
