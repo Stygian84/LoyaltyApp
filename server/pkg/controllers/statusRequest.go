@@ -27,6 +27,10 @@ func (server *Server) GetAllCreditRequest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if userRequests == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No request found"})
+		return
+	}
 	result := GetTransStatus(userRequests)
 	fmt.Println(result)
 	c.JSON(http.StatusOK, result)
