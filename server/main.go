@@ -15,7 +15,9 @@ func main() {
 	// if err!=nil{
 	//   log.Fatal("cannot start server",err)
 	// }
-	//err := handle.ReadHandbackFile()
-	err := handle.SendAccrual()
-	log.Fatal(err)
+	err := handle.ReadHandbackFile()
+	//err := handle.SendAccrual()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

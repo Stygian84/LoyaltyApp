@@ -79,7 +79,10 @@ func ReadHandbackFile() (err error) {
 				TransactionStatus: models.TransactionStatusEnumRejected,
 				ReferenceNumber:   int_reference_number,
 			}
-			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
+			err = Queries.UpdateTransactionStatusByID(context.Background(), args)
+			if err != nil {
+				log.Fatal(err)
+			}
 			log.Printf("Reference Number %v Is Successfully Rejected", reference_number)
 
 			credit_details, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)

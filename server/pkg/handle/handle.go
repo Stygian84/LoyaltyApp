@@ -51,7 +51,7 @@ var UploadAccrual = func() {
 		sc.Close()
 
 	}
-	os.RemoveAll("/temp/")
+
 	log.Printf("All files are uploaded successfully")
 
 }

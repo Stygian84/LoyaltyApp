@@ -16,7 +16,7 @@ func createLoyaltyObject() models.CreateLoyaltyParams {
 		Name:               utils.RandomString(6),
 		CurrencyName:       utils.RandomString(6),
 		ProcessingTime:     utils.RandomString(4),
-		Description:        sql.NullString{String: utils.RandomString(20), Valid: true},
+		Description:        utils.RandomString(20),
 		EnrollmentLink:     utils.RandomString(20),
 		TermsConditionLink: utils.RandomString(20),
 		FormatRegex:        "100\\d{4}$",

@@ -15,7 +15,6 @@ import (
 func SendAccrual() (err error) {
 	config.Connect()
 	Queries = models.New(config.GetDB())
-	conn, sc := ConnectToSFTP()
 
 	// mkdir temp
 	path := "temp"
@@ -27,7 +26,7 @@ func SendAccrual() (err error) {
 	}
 
 	//index, memberID, member fullname, transfer date, amount, reference no, partnercode
-	// left with index and partnercode
+
 	credit_request_list, err := Queries.ListCreditRequest(context.Background())
 	if err != nil {
 		log.Fatal(err)
@@ -66,7 +65,8 @@ func SendAccrual() (err error) {
 
 		idx := 1
 		for _, credit_request_details := range credit_request_ls {
-			tempList := []string{}
+			rowList := []string{}
+
 			user_id := credit_request_details.UserID
 			member_id := credit_request_details.MemberID
 			credit_used := credit_request_details.CreditUsed
@@ -74,13 +74,21 @@ func SendAccrual() (err error) {
 			full_name := user_details.FullName.String
 			transfer_date := time.Now().Format("2006-01-02")
 			reference_number := credit_request_details.ReferenceNumber
-			tempList = append(tempList, strconv.FormatInt(int64(idx), 10), member_id, full_name, transfer_date, strconv.FormatInt(int64(credit_used), 10), strconv.FormatInt(int64(reference_number), 10), file_name)
+
+			rowList = append(rowList, strconv.FormatInt(int64(idx), 10), member_id, full_name, transfer_date, strconv.FormatInt(int64(credit_used), 10), strconv.FormatInt(int64(reference_number), 10), file_name)
 			idx += 1
-			tempData = append(tempData, tempList)
+			tempData = append(tempData, rowList)
+
+			// Update transaction status to Pending
+			args := models.UpdateTransactionStatusByIDParams{
+				TransactionStatus: models.TransactionStatusEnumPending,
+				ReferenceNumber:   int64(reference_number),
+			}
+			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
 		}
 
-		for _, empRow := range tempData {
-			_ = csvwriter.Write(empRow)
+		for _, tempRow := range tempData {
+			_ = csvwriter.Write(tempRow)
 		}
 
 		csvwriter.Flush()
@@ -90,8 +98,9 @@ func SendAccrual() (err error) {
 	// Update all status to pending, updatetransaction
 	UploadAccrual()
 	err = os.RemoveAll("./temp")
-	sc.Close()
-	conn.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Print("Disconnecting from sftp server ...")
 	return err
 }
