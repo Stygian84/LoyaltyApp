@@ -3,12 +3,15 @@ module esc/ascendaRoyaltyPoint
 go 1.18
 
 require (
+
 	github.com/gin-gonic/gin v1.8.1
 	github.com/lib/pq v1.10.6
 	github.com/pkg/sftp v1.13.1
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+  github.com/gin-contrib/cors v1.4.0
+
 )
 
 require (
