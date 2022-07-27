@@ -16,7 +16,7 @@ func createLoyaltyObject() models.CreateLoyaltyParams {
 		Name:               utils.RandomString(6),
 		CurrencyName:       utils.RandomString(6),
 		ProcessingTime:     utils.RandomString(4),
-		Description:        sql.NullString{String: utils.RandomString(20), Valid: true},
+		Description:        utils.RandomString(20),
 		EnrollmentLink:     utils.RandomString(20),
 		TermsConditionLink: utils.RandomString(20),
 		FormatRegex:        "100\\d{4}$",
@@ -201,6 +201,57 @@ func TestRewardCalNormal(t *testing.T) {
 	require.Equal(t, expected, result)
 
 }
+// add with one time promo, when promo is not used
+func TestAddOneTimePromo(t *testing.T) {
+	createLoyaltyArgs := createLoyaltyObject()
+	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	var creditToTransfer float64 = 100
+	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
+	require.NoError(t, err)
+	user, err := testQueries.CreateUser(context.Background(), createUserArgs)
+	require.NoError(t, err)
+	args := models.TransferParams{
+		UserId:           int32(user.ID),
+		ProgramId:        int32(program.ID),
+		CreditToTransfer: float64(creditToTransfer),
+		MembershipId:     utils.RandomString(6),
+	}
+
+	startDate, err := time.Parse("2006-01-02", "2022-07-01")
+	require.NoError(t, err)
+	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	require.NoError(t, err)
+
+	var constant float64 = 1000
+	createPromoArgs := models.CreatePromotionParams{
+		Program:      int32(program.ID),
+		PromoType:    models.PromoTypeEnum("onetime"),
+		StartDate:    startDate,
+		EndDate:      endDate,
+		EarnRateType: models.EarnRateTypeEnum("add"),
+		Constant:     float64(constant),
+	}
+
+	createCreditRequestArgs := models.CreateCreditRequestParams{
+		UserID:              int32(user.ID),
+		PromoUsed:           sql.NullInt32{Valid: false},
+		Program:             int32(program.ID),
+		MemberID:            utils.RandomString(20),
+		TransactionTime:     sql.NullTime{Valid: true, Time: startDate},
+		CreditUsed:          creditToTransfer,
+		RewardShouldReceive: utils.RandomFloat(30),
+		TransactionStatus:   models.TransactionStatusEnum("pending"),
+	}
+
+	_, err = testQueries.CreateCreditRequest(context.Background(), createCreditRequestArgs)
+	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
+	require.NoError(t, err)
+	result, _, err := CalculateReward(context.Background(), testQueries, args)
+	require.NoError(t, err)
+	expected := creditToTransfer*(program.InitialEarnRate) 
+	require.Equal(t, expected, result)
+}
+
 
 // Test for Mul One Time Promotion with Previous Credit Request
 func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
@@ -236,6 +287,55 @@ func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
 	result, _, err := CalculateReward(context.Background(), testQueries, args)
 	require.NoError(t, err)
 	expected := creditToTransfer * (program.InitialEarnRate)
+	require.Equal(t, result, expected)
+}
+// test when there is multiple promotion going on, take the one with greatest return
+func TestMultiplePromotions(t *testing.T) {
+	createLoyaltyArgs := createLoyaltyObject()
+	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	var creditToTransfer float64 = 100
+	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
+	require.NoError(t, err)
+	user, err := testQueries.CreateUser(context.Background(), createUserArgs)
+	require.NoError(t, err)
+	args := models.TransferParams{
+		UserId:           int32(user.ID),
+		ProgramId:        int32(program.ID),
+		CreditToTransfer: creditToTransfer,
+		MembershipId:     utils.RandomString(6),
+	}
+
+	startDate, err := time.Parse("2006-01-02", "2022-07-01")
+	require.NoError(t, err)
+	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	require.NoError(t, err)
+
+	var constant1 float64 = 1000
+	createPromoArgs1 := models.CreatePromotionParams{
+		Program:      int32(program.ID),
+		PromoType:    models.PromoTypeEnum("ongoing"),
+		StartDate:    startDate,
+		EndDate:      endDate,
+		EarnRateType: models.EarnRateTypeEnum("add"),
+		Constant:     float64(constant1),
+	}
+
+	var constant2 float64 = 200
+	createPromoArgs2 := models.CreatePromotionParams{
+		Program:      int32(program.ID),
+		PromoType:    models.PromoTypeEnum("ongoing"),
+		StartDate:    startDate,
+		EndDate:      endDate,
+		EarnRateType: models.EarnRateTypeEnum("mul"),
+		Constant:     float64(constant2),
+	}
+	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs1)
+	require.NoError(t, err)
+	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs2)
+	require.NoError(t, err)
+	result, _, err := CalculateReward(context.Background(), testQueries, args)
+	require.NoError(t, err)
+	expected := creditToTransfer * (program.InitialEarnRate) * constant2
 	require.Equal(t, result, expected)
 }
 
@@ -331,6 +431,50 @@ func TestMulRequireCardTierMatch(t *testing.T) {
 	result, _, err := CalculateReward(context.Background(), testQueries, args)
 	require.NoError(t, err)
 	expected := creditToTransfer * (program.InitialEarnRate) * constant
+	require.Equal(t, result, expected)
+}
+// add when there is a card tier requirement for promo, when user card tier == promo card tier
+func TestAddCardTier(t *testing.T) {
+	createCardTierArgs := models.CreateCardTierParams{
+		Name: utils.RandomString(6),
+		Tier: 3,
+	}
+	cardTier, err := testQueries.CreateCardTier(context.Background(), createCardTierArgs)
+	require.NoError(t, err)
+
+	createLoyaltyArgs := createLoyaltyObject()
+	createUserArgs := createUserObject(sql.NullInt32{Valid: true, Int32: int32(cardTier.ID)})
+
+	var creditToTransfer float64 = 100
+	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
+	require.NoError(t, err)
+	user, err := testQueries.CreateUser(context.Background(), createUserArgs)
+	require.NoError(t, err)
+	args := models.TransferParams{
+		UserId:           int32(user.ID),
+		ProgramId:        int32(program.ID),
+		CreditToTransfer: creditToTransfer,
+		MembershipId:     utils.RandomString(6),
+	}
+	startDate, err := time.Parse("2006-01-02", "2022-07-01")
+	require.NoError(t, err)
+	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	require.NoError(t, err)
+	var constant float64 = 1000
+	createPromoArgs := models.CreatePromotionParams{
+		Program:      int32(program.ID),
+		PromoType:    models.PromoTypeEnum("ongoing"),
+		StartDate:    startDate,
+		EndDate:      endDate,
+		EarnRateType: models.EarnRateTypeEnum("add"),
+		Constant:     float64(constant),
+		CardTier:     sql.NullInt32{Valid: true, Int32: int32(cardTier.ID)},
+	}
+	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
+	require.NoError(t, err)
+	result, _, err := CalculateReward(context.Background(), testQueries, args)
+	require.NoError(t, err)
+	expected := creditToTransfer * (program.InitialEarnRate)+constant
 	require.Equal(t, result, expected)
 }
 
