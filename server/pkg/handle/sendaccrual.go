@@ -74,6 +74,9 @@ func SendAccrual() (err error) {
 			full_name := user_details.FullName.String
 			transfer_date := time.Now().Format("2006-01-02")
 			reference_number := credit_request_details.ReferenceNumber
+			// program_id := credit_request_details.Program
+			// //search program by program id sql
+			// partner_code := progra
 
 			rowList = append(rowList, strconv.FormatInt(int64(idx), 10), member_id, full_name, transfer_date, strconv.FormatInt(int64(credit_used), 10), strconv.FormatInt(int64(reference_number), 10), file_name)
 			idx += 1
@@ -97,6 +100,8 @@ func SendAccrual() (err error) {
 
 	// Update all status to pending, updatetransaction
 	UploadAccrual()
+
+	// Delete temp folder containing newly created csv file for transfer
 	err = os.RemoveAll("./temp")
 	if err != nil {
 		log.Fatal(err)

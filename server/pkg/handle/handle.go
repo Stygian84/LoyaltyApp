@@ -185,7 +185,7 @@ func downloadFile(sc sftp.Client, remoteFile, localFile string) (err error) {
 	if err != nil {
 		return fmt.Errorf("unable to download remote file: %v", err)
 	}
-	_ = bytes // to avoid declared and not used error
+	_ = bytes
 	//log.Printf("%d bytes copied to %v", bytes, dstFile)
 
 	return nil

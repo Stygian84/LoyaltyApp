@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var Queries *models.Queries
@@ -48,8 +49,8 @@ func ReadHandbackFile() (err error) {
 		// column title = records [0]
 		// transfer_date := records [1][2]
 		// amount := records [2][2]
-		reference_number := records[3][2]
-		outcome_code := records[4][2]
+		reference_number := strings.Trim(records[3][2], "\"")
+		outcome_code := strings.Trim(records[4][2], "\"")
 		int_reference_number, err := strconv.ParseInt(reference_number, 10, 64)
 		if err != nil {
 			log.Fatal(err)
@@ -58,7 +59,6 @@ func ReadHandbackFile() (err error) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		credit_request, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
 		if err != nil {
 			log.Fatal(err)
@@ -90,6 +90,7 @@ func ReadHandbackFile() (err error) {
 				log.Fatal(err)
 			}
 
+			// Refunded credit used since transaction was rejected
 			user_id := credit_details.UserID
 			credit_used := credit_details.CreditUsed
 			log.Printf("%.2f credits are refunded to USERID %v", credit_used, user_id)
@@ -101,6 +102,8 @@ func ReadHandbackFile() (err error) {
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			//Notify user through email
 
 		}
 		_ = credit_request
