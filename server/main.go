@@ -2,6 +2,7 @@ package main
 
 import (
 	"esc/ascendaRoyaltyPoint/pkg/config"
+	"esc/ascendaRoyaltyPoint/pkg/handle"
 	// "esc/ascendaRoyaltyPoint/pkg/handle"
 	"esc/ascendaRoyaltyPoint/pkg/controllers"
 	"esc/ascendaRoyaltyPoint/pkg/models"
@@ -9,6 +10,9 @@ import (
 )
 
 func main() {
+
+	go handle.RunCron("01:00", "03:00")
+
 	config.Connect()
 	db := config.GetDB()
 	store := models.NewStore(db)
@@ -17,9 +21,5 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot start server", err)
 	}
-	// err := handle.ReadHandbackFile()
-	// err := handle.SendAccrual()
-	// log.Fatal(err)
-	//handle.RunCron("01:00","03:00")
 
 }
