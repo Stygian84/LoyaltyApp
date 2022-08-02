@@ -23,9 +23,9 @@ const (
 	sftpPort = "22"
 )
 
-var UploadAccrual = func() {
-
-	theFiles, err := ioutil.ReadDir("./temp/")
+// localtempDir should be "./temp/" while remoteDir should be "./accrual/"
+func UploadAccrual(localtempDir string, remoteDir string) {
+	theFiles, err := ioutil.ReadDir(localtempDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,8 +39,8 @@ var UploadAccrual = func() {
 	for _, theFile := range theFiles {
 		conn, sc := ConnectToSFTP()
 		// Upload local file to remote file
-		remoteFile := "./accrual/" + fmt.Sprint(theFile.Name())
-		localFile := "./temp/" + fmt.Sprint(theFile.Name())
+		remoteFile := remoteDir + fmt.Sprint(theFile.Name())
+		localFile := localtempDir + fmt.Sprint(theFile.Name())
 
 		err = uploadFile(*sc, localFile, remoteFile)
 		if err != nil {
@@ -53,43 +53,6 @@ var UploadAccrual = func() {
 	}
 
 	log.Printf("All files are uploaded successfully")
-
-}
-
-var DownloadHandback = func() {
-
-	conn, sc := ConnectToSFTP()
-
-	// List files in the remote handback directory .
-	theFiles, err := listFiles(*sc, "./handback")
-	if err != nil {
-		log.Fatalf("failed to list files in ./handback: %v", err)
-	}
-
-	log.Printf("Found Files in ./handback Files")
-	// Output each file name and size in bytes
-	log.Printf("%19s %12s %s", "MOD TIME", "SIZE", "NAME")
-	for _, theFile := range theFiles {
-		log.Printf("%19s %12s %s", theFile.ModTime, theFile.Size, theFile.Name)
-	}
-
-	// Download remote file to local file.
-	// Downloaded from handback folder to files/handback folder
-	for _, theFile := range theFiles {
-
-		remoteFile := "./handback/" + theFile.Name
-		localFile := "./files/handback/" + theFile.Name
-
-		err = downloadFile(*sc, remoteFile, localFile)
-		if err != nil {
-			log.Fatalf("Could not download file %s; %v", theFile.Name, err)
-		}
-	}
-
-	log.Printf("All files are downloaded successfully")
-
-	conn.Close()
-	sc.Close()
 
 }
 
@@ -241,5 +204,6 @@ func ConnectToSFTP() (*ssh.Client, *sftp.Client) {
 		log.Fatalf("Unable to start SFTP subsystem: %v", err)
 	}
 	//defer sc.Close()
+
 	return conn, sc
 }

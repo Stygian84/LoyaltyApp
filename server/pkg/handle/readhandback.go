@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"esc/ascendaRoyaltyPoint/pkg/config"
 	"esc/ascendaRoyaltyPoint/pkg/models"
+	"fmt"
 	"log"
 	"net/smtp"
 	"os"
@@ -88,7 +89,7 @@ func ReadHandbackFile() (err error) {
 			log.Printf("Reference Number %v Is Successfully Approved", reference_number)
 
 			// Notify user through email
-			err = sendEmail(email_to, true, user_details.UserName, reference_number)
+			err = sendEmail(email_to, true, user_details.UserName, reference_number, user_id, user_details.CreditBalance, credit_details.CreditUsed, "Approved")
 			if err != nil {
 				log.Printf("Email for %s with USERID %v cannot be reached \n", user_details.UserName, user_id)
 			}
@@ -119,7 +120,7 @@ func ReadHandbackFile() (err error) {
 			}
 
 			//Notify user through email
-			err = sendEmail(email_to, false, user_details.UserName, reference_number)
+			err = sendEmail(email_to, false, user_details.UserName, reference_number, user_id, user_details.CreditBalance, credit_details.CreditUsed, "Rejected")
 			if err != nil {
 				log.Printf("Email for %s with USERID %v cannot be reached \n", user_details.UserName, user_id)
 			}
@@ -136,7 +137,7 @@ func ReadHandbackFile() (err error) {
 }
 
 // Approved = true if approved
-func sendEmail(email_to string, approved bool, user_name string, reference_number string) (err error) {
+func sendEmail(email_to string, approved bool, user_name string, reference_number string, user_id int32, user_balance float64, credit_used float64, status string) (err error) {
 	from := email
 	password := email_pw
 
@@ -147,16 +148,29 @@ func sendEmail(email_to string, approved bool, user_name string, reference_numbe
 	port := "587"
 	address := host + ":" + port
 
-	recipient := user_name
-
 	var subject string
 	var body string
 	if approved {
 		subject = "Subject: Your transaction has been approved\n"
-		body = "Dear " + recipient + ", \n Your transaction with reference number " + reference_number + " has been approved \n"
+		body = fmt.Sprintf("Dear %v , \n\nYour transaction with reference number %v has been approved. \n\n"+
+			"The transaction details are as folllows : \n"+
+			"User ID : %v \n"+
+			"User Name : %v \n"+
+			"Reference Number : %v \n"+
+			"User Balance : %.2f \n"+
+			"Credit Used : %.2f \n"+
+			"Transaction Status : %v \n", user_name, reference_number, int(user_id), user_name, reference_number, user_balance, credit_used, status)
 	} else {
 		subject = "Subject: Your transaction has been rejected\n"
-		body = "Dear " + recipient + ", \n Your transaction with reference number " + reference_number + " has been rejected \n"
+		body = fmt.Sprintf("Dear %v , \n\n Your transaction with reference number %v has been rejected. \n\n"+
+			"The transaction details are as folllows : \n"+
+			"User ID : %v \n"+
+			"User Name : %v \n"+
+			"Reference Number : %v \n"+
+			"User Balance : %.2f \n"+
+			"Credit Refunded : %.2f \n"+
+			"Transaction Status : %v \n"+
+			"Reason : Insufficient Balance \n", user_name, reference_number, int(user_id), user_name, reference_number, user_balance, credit_used, status)
 	}
 
 	message := []byte(subject + body)

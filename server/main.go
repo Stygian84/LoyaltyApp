@@ -2,12 +2,13 @@ package main
 
 import (
 	"esc/ascendaRoyaltyPoint/pkg/config"
-	"esc/ascendaRoyaltyPoint/pkg/handle"
-	// "esc/ascendaRoyaltyPoint/pkg/handle"
 	"esc/ascendaRoyaltyPoint/pkg/controllers"
+	"esc/ascendaRoyaltyPoint/pkg/handle"
 	"esc/ascendaRoyaltyPoint/pkg/models"
 	"log"
 )
+
+// "esc/ascendaRoyaltyPoint/pkg/handle"
 
 func main() {
 

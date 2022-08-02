@@ -12,6 +12,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func createUserObjectFuzz(email string) models.CreateUserParams {
+	arg := models.CreateUserParams{
+		FullName:      sql.NullString{Valid: true, String: utils.RandomString(6)},
+		CreditBalance: 2000,
+		Email:         email,
+		Contact:       sql.NullInt32{Valid: false},
+		Password:      utils.RandomString(10),
+		UserName:      utils.RandomString(5),
+		CardTier:      sql.NullInt32{Valid: false},
+	}
+	return arg
+}
+
 func FuzzCalRewards(f *testing.F) {
 
 	f.Add(utils.RandomFloat(10000), utils.RandomFloat(10000))
@@ -53,7 +66,7 @@ func FuzzMulOnGoingPromo(f *testing.F) {
 		var creditToTransfer float64 = math.Abs(n4)
 
 		createLoyaltyArgs := createLoyaltyObject()
-		createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+		createUserArgs := createUserObjectFuzz(utils.RandomString(120))
 		program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 		require.NoError(t, err)
 		user, err := testQueries.CreateUser(context.Background(), createUserArgs)
@@ -74,14 +87,14 @@ func FuzzMulOnGoingPromo(f *testing.F) {
 			PromoType:    models.PromoTypeEnum("ongoing"),
 			StartDate:    startDate,
 			EndDate:      endDate,
-			EarnRateType: models.EarnRateTypeEnum("mul"),
+			EarnRateType: models.EarnRateTypeEnum("add"),
 			Constant:     float64(constant),
 		}
 		_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 		require.NoError(t, err)
 		result, _, err := CalculateReward(context.Background(), testQueries, args)
 		require.NoError(t, err)
-		expected := creditToTransfer * (program.InitialEarnRate) * constant
+		expected := creditToTransfer*(program.InitialEarnRate) + constant
 		require.Equal(t, expected, result)
 	})
 }
