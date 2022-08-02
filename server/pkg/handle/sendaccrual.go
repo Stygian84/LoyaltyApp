@@ -41,10 +41,10 @@ func SendAccrual() (err error) {
 			program_dict[program_id] = 0
 		}
 	}
-
-	//key is program_id
+	log.Println(program_dict)
+	//key is program_id for now
 	for key, element := range program_dict {
-
+		log.Println(key, "values is", element)
 		_ = element
 		//update file name to include date later
 		file_name := strconv.FormatInt(int64(key), 10)

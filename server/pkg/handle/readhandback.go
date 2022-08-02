@@ -59,10 +59,11 @@ func ReadHandbackFile() (err error) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		credit_request, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
+		credit_details, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
 		if err != nil {
 			log.Fatal(err)
 		}
+		user_id := credit_details.UserID
 		// int_outcome_code = 0 -> approved
 		// int_outcome_code = 1 -> rejected
 		if int_outcome_code == 0 {
@@ -73,6 +74,7 @@ func ReadHandbackFile() (err error) {
 			}
 			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
 			log.Printf("Reference Number %v Is Successfully Approved", reference_number)
+
 		} else {
 			// Update transaction status to rejected
 			args := models.UpdateTransactionStatusByIDParams{
@@ -85,13 +87,8 @@ func ReadHandbackFile() (err error) {
 			}
 			log.Printf("Reference Number %v Is Successfully Rejected", reference_number)
 
-			credit_details, err := Queries.GetCreditRequestByID(context.Background(), int_reference_number)
-			if err != nil {
-				log.Fatal(err)
-			}
-
 			// Refunded credit used since transaction was rejected
-			user_id := credit_details.UserID
+
 			credit_used := credit_details.CreditUsed
 			log.Printf("%.2f credits are refunded to USERID %v", credit_used, user_id)
 			balanceargs := models.IncrBalanceParams{
@@ -106,7 +103,6 @@ func ReadHandbackFile() (err error) {
 			//Notify user through email
 
 		}
-		_ = credit_request
 	}
 
 	log.Println("Disconnecting from SFTP server ...")
