@@ -24,10 +24,6 @@ func(server *Server)CreateUser(c *gin.Context){
   }
 
 
-type NameInput struct{
-	Username string `json:"user_name"`
-}
-
 func (server *Server) GetUserByUserName(c *gin.Context){
 	username := c.Param("username")
 	
