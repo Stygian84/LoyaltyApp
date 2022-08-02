@@ -1,10 +1,11 @@
 package controllers
 
-import (
-	"esc/ascendaRoyaltyPoint/pkg/models"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+import(
+  "esc/ascendaRoyaltyPoint/pkg/models"
+  "github.com/gin-contrib/cors"
+  "github.com/gin-gonic/gin"
+
 )
 
 type Server struct {
@@ -17,23 +18,28 @@ func (server *Server) Start(address string) error {
 
 }
 
-func NewServer(store *models.Store) *Server {
-	server := &Server{
-		store: store,
-	}
-	router := gin.Default()
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	router.Use(cors.New(config))
 
-	router.POST("/initTransaction", server.CreateTransaction)
-	router.POST("/loyalty/validateMembership", server.CheckLoyaltyRegEx)
-	router.POST("/loyalty", server.CreateLoyaltyProg)
-	router.GET("/loyalty", server.GetLoyalty)
-	router.GET("/loyalty/:id", server.GetLoyaltyId)
-	router.POST("/checkReward", server.CheckRewardRate)
+func NewServer(store *models.Store) *Server{
+  server := &Server{
+    store:store,
+  }
+  router := gin.Default()
 
-	router.GET("/transaction_status/:id", server.GetAllCreditRequest)
-	server.router = router
-	return server
+  config := cors.DefaultConfig()
+  config.AllowAllOrigins = true
+  router.Use(cors.New(config))
+  router.POST("/initTransaction",server.CreateTransaction)
+  router.POST("/loyalty/validateMembership", server.CheckLoyaltyRegEx)
+  router.POST("/loyalty", server.CreateLoyaltyProg)
+  router.GET("/loyalty", server.GetLoyalty)
+  router.GET("/loyalty/:id", server.GetLoyaltyId)
+  router.POST("/checkReward",server.CheckRewardRate)
+  router.POST("/createUser",server.CreateUser)
+  router.GET("/getUserbyUsername/:username", server.GetUserByUserName)
+  router.GET("/getUserbyEmail/:email", server.GetUserByEmail)
+  	router.GET("/transaction_status/:id", server.GetAllCreditRequest)x
+  
+  server.router=router
+  return server
+
 }

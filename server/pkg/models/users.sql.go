@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 	"database/sql"
+	
 )
 
 const createUser = `-- name: CreateUser :one

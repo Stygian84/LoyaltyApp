@@ -26,7 +26,7 @@ func (server *Server) GetLoyalty(c *gin.Context){
     c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
   }
-  c.JSON(http.StatusCreated,progs)
+  c.JSON(http.StatusOK,progs)
 }
 func (server *Server) GetLoyaltyId(c *gin.Context){
   id,err := strconv.Atoi(c.Param("id"))
@@ -40,7 +40,7 @@ func (server *Server) GetLoyaltyId(c *gin.Context){
     c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
   }
-  c.JSON(http.StatusCreated,prog)
+  c.JSON(http.StatusOK,prog)
 }
 
 

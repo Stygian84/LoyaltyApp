@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 html,
 body {
   padding: 0;
@@ -13,4 +16,22 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.ml-300{
+  margin-left:300px;
+}
+
+.ml-500{
+  margin-left:500px;
+}
+
+.mr-30{
+  margin-right:140px;
+}
+
+input,
+select,
+textarea{
+@apply rounded border p-2 outline-none ring-indigo-300 focus:ring;
 }
