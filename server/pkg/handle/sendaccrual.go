@@ -27,10 +27,11 @@ func SendAccrual() (err error) {
 
 	//index, memberID, member fullname, transfer date, amount, reference no, partnercode
 
-	credit_request_list, err := Queries.ListCreditRequest(context.Background())
+	credit_request_list, err := Queries.ListCreditRequestByStatus(context.Background(), models.TransactionStatusEnumCreated)
 	if err != nil {
 		log.Fatal(err)
 	}
+	// key should be partnercode , value = program id
 	program_dict := make(map[int32]int)
 
 	for _, credit_request := range credit_request_list {
