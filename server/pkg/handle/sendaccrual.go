@@ -46,7 +46,6 @@ func SendAccrual() (err error) {
 			program_dict[program_id] = 0
 		}
 	}
-	log.Println(program_dict)
 	// program_details,err := Queries.GetLoyaltyByID(context.Background(),int64(program_id))
 	//key is program_code
 	for key, element := range program_dict {
