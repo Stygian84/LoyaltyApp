@@ -6,12 +6,18 @@ import (
 	"esc/ascendaRoyaltyPoint/pkg/config"
 	"esc/ascendaRoyaltyPoint/pkg/models"
 	"log"
+	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
 )
 
 var Queries *models.Queries
+
+const (
+	email    = "stygian8442@gmail.com"
+	email_pw = "mvmeztlcrqqclfxc"
+)
 
 func ReadHandbackFile() (err error) {
 	config.Connect()
@@ -64,6 +70,12 @@ func ReadHandbackFile() (err error) {
 			log.Fatal(err)
 		}
 		user_id := credit_details.UserID
+
+		user_details, err := Queries.GetUserByID(context.Background(), int64(user_id))
+		if err != nil {
+			log.Fatal(err)
+		}
+		email_to := user_details.Email
 		// int_outcome_code = 0 -> approved
 		// int_outcome_code = 1 -> rejected
 		if int_outcome_code == 0 {
@@ -74,6 +86,9 @@ func ReadHandbackFile() (err error) {
 			}
 			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
 			log.Printf("Reference Number %v Is Successfully Approved", reference_number)
+
+			// Notify user through email
+			sendEmail(email_to, true, user_details.UserName, reference_number)
 
 		} else {
 			// Update transaction status to rejected
@@ -101,6 +116,7 @@ func ReadHandbackFile() (err error) {
 			}
 
 			//Notify user through email
+			sendEmail(email_to, false, user_details.UserName, reference_number)
 
 		}
 	}
@@ -110,5 +126,40 @@ func ReadHandbackFile() (err error) {
 	sc.Close()
 
 	return err
+
+}
+
+// Approved = true if approved
+func sendEmail(email_to string, approved bool, user_name string, reference_number string) {
+	from := email
+	password := email_pw
+
+	toEmailAddress := email_to
+	to := []string{toEmailAddress}
+
+	host := "smtp.gmail.com"
+	port := "587"
+	address := host + ":" + port
+
+	recipient := user_name
+
+	var subject string
+	var body string
+	if approved {
+		subject = "Subject: Your transaction has been approved\n"
+		body = "Dear " + recipient + ", \n Your transaction with reference number " + reference_number + " has been approved \n"
+	} else {
+		subject = "Subject: Your transaction has been rejected\n"
+		body = "Dear " + recipient + ", \n Your transaction with reference number " + reference_number + " has been rejected \n"
+	}
+
+	message := []byte(subject + body)
+
+	auth := smtp.PlainAuth("", from, password, host)
+
+	err := smtp.SendMail(address, auth, from, to, message)
+	if err != nil {
+		panic(err)
+	}
 
 }

@@ -35,6 +35,10 @@ func SendAccrual() (err error) {
 
 	for _, credit_request := range credit_request_list {
 		program_id := credit_request.Program
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		if _, ok := program_dict[program_id]; ok {
 			continue
 		} else {
@@ -42,13 +46,13 @@ func SendAccrual() (err error) {
 		}
 	}
 	log.Println(program_dict)
-	//key is program_id for now
+	// program_details,err := Queries.GetLoyaltyByID(context.Background(),int64(program_id))
+	//key is program_code
 	for key, element := range program_dict {
-		log.Println(key, "values is", element)
 		_ = element
 		//update file name to include date later
 		file_name := strconv.FormatInt(int64(key), 10)
-		csvFile, err := os.Create("./temp/" + file_name + ".csv")
+		csvFile, err := os.Create("./temp/" + file_name + "_" + time.Now().Format("2006-01-02") + ".csv")
 		if err != nil {
 			log.Fatal(err)
 		}
