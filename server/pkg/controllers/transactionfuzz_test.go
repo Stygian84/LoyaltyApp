@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"esc/ascendaRoyaltyPoint/pkg/models"
 	"esc/ascendaRoyaltyPoint/pkg/utils"
+	"fmt"
 	"math"
 	"testing"
 	"time"
@@ -12,14 +14,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createUserObjectFuzz(email string) models.CreateUserParams {
+func createUserObjectFuzz(email string, name string) models.CreateUserParams {
 	arg := models.CreateUserParams{
-		FullName:      sql.NullString{Valid: true, String: utils.RandomString(6)},
+		FullName:      sql.NullString{Valid: true, String: name},
 		CreditBalance: 2000,
 		Email:         email,
 		Contact:       sql.NullInt32{Valid: false},
 		Password:      utils.RandomString(10),
-		UserName:      utils.RandomString(5),
+		UserName:      name,
 		CardTier:      sql.NullInt32{Valid: false},
 	}
 	return arg
@@ -65,8 +67,13 @@ func FuzzMulOnGoingPromo(f *testing.F) {
 		var constant float64 = math.Abs(n3)
 		var creditToTransfer float64 = math.Abs(n4)
 
+		// Generate unique string
+		n := 10
+		b := make([]byte, n)
+		_, _ = rand.Read(b)
+
 		createLoyaltyArgs := createLoyaltyObject()
-		createUserArgs := createUserObjectFuzz(utils.RandomString(120))
+		createUserArgs := createUserObjectFuzz(fmt.Sprintf("%x", b), fmt.Sprintf("%x", b))
 		program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 		require.NoError(t, err)
 		user, err := testQueries.CreateUser(context.Background(), createUserArgs)
