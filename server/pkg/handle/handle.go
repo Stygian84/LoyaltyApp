@@ -242,6 +242,5 @@ func ConnectToSFTP() (*ssh.Client, *sftp.Client) {
 		log.Fatalf("Unable to start SFTP subsystem: %v", err)
 	}
 	//defer sc.Close()
-
 	return conn, sc
 }

@@ -88,7 +88,10 @@ func ReadHandbackFile() (err error) {
 			log.Printf("Reference Number %v Is Successfully Approved", reference_number)
 
 			// Notify user through email
-			sendEmail(email_to, true, user_details.UserName, reference_number)
+			err = sendEmail(email_to, true, user_details.UserName, reference_number)
+			if err != nil {
+				log.Printf("Email for %s with USERID %v cannot be reached \n", user_details.UserName, user_id)
+			}
 
 		} else {
 			// Update transaction status to rejected
@@ -116,7 +119,10 @@ func ReadHandbackFile() (err error) {
 			}
 
 			//Notify user through email
-			sendEmail(email_to, false, user_details.UserName, reference_number)
+			err = sendEmail(email_to, false, user_details.UserName, reference_number)
+			if err != nil {
+				log.Printf("Email for %s with USERID %v cannot be reached \n", user_details.UserName, user_id)
+			}
 
 		}
 	}
@@ -130,7 +136,7 @@ func ReadHandbackFile() (err error) {
 }
 
 // Approved = true if approved
-func sendEmail(email_to string, approved bool, user_name string, reference_number string) {
+func sendEmail(email_to string, approved bool, user_name string, reference_number string) (err error) {
 	from := email
 	password := email_pw
 
@@ -157,9 +163,7 @@ func sendEmail(email_to string, approved bool, user_name string, reference_numbe
 
 	auth := smtp.PlainAuth("", from, password, host)
 
-	err := smtp.SendMail(address, auth, from, to, message)
-	if err != nil {
-		panic(err)
-	}
+	err = smtp.SendMail(address, auth, from, to, message)
+	return err
 
 }
