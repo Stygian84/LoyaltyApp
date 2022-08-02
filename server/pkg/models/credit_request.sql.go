@@ -246,6 +246,45 @@ func (q *Queries) ListCreditRequest(ctx context.Context) ([]CreditRequest, error
 	return items, nil
 }
 
+const listCreditRequestByStatus = `-- name: ListCreditRequestByStatus :many
+SELECT reference_number, user_id, program, member_id, transaction_time, credit_used, reward_should_receive, promo_used, transaction_status FROM credit_request
+WHERE transaction_status = $1
+ORDER BY program
+`
+
+func (q *Queries) ListCreditRequestByStatus(ctx context.Context, transactionStatus TransactionStatusEnum) ([]CreditRequest, error) {
+	rows, err := q.db.QueryContext(ctx, listCreditRequestByStatus, transactionStatus)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CreditRequest
+	for rows.Next() {
+		var i CreditRequest
+		if err := rows.Scan(
+			&i.ReferenceNumber,
+			&i.UserID,
+			&i.Program,
+			&i.MemberID,
+			&i.TransactionTime,
+			&i.CreditUsed,
+			&i.RewardShouldReceive,
+			&i.PromoUsed,
+			&i.TransactionStatus,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateCreditRequest = `-- name: UpdateCreditRequest :exec
 UPDATE credit_request 
 SET user_id = COALESCE($1,user_id),

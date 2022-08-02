@@ -14,6 +14,10 @@ WHERE program = $1;
 SELECT * FROM credit_request
 WHERE program = $1 AND promo_used=$2 ; 
 
+-- name: ListCreditRequestByStatus :many
+SELECT * FROM credit_request
+WHERE transaction_status = $1
+ORDER BY program;
 
 -- name: ListCreditRequest :many
 SELECT * FROM credit_request
