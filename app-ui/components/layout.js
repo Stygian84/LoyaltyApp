@@ -21,7 +21,7 @@ export default function Layout({ title, children }) {
         
         <div className="flex min-h-screen flex-col justify-between">
             <header>
-                <nav className="flex h-12 items-centre px-4 justify-between shadow-md bg-blue-800">
+                <nav className="flex h-12 items-centre px-4 py-2 justify-between shadow-md bg-blue-800">
                     <Link href="/"> 
                     
                     <a className="text-lg font-bold text-white">Transfer Rewards </a>

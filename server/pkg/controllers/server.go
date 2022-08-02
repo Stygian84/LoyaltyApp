@@ -30,6 +30,10 @@ func NewServer(store *models.Store) *Server{
   router.GET("/loyalty", server.GetLoyalty)
   router.GET("/loyalty/:id", server.GetLoyaltyId)
   router.POST("/checkReward",server.CheckRewardRate)
+  router.POST("/createUser",server.CreateUser)
+  router.GET("/getUserbyUsername/:username", server.GetUserByUserName)
+  router.GET("/getUserbyEmail/:email", server.GetUserByEmail)
+  
   server.router=router
   return server
 }

@@ -20,7 +20,7 @@ export default function Program({program}){
 
     return(
 
-        <div className="card rounded shadow flex flex-col items-center justify center p-5 ">
+        <div className="card rounded shadow flex flex-col items-center justify center p-5  border">
             
             {/* <Image 
             src= {program.image}
@@ -37,12 +37,14 @@ export default function Program({program}){
                 <h2 className="text-lg">{program.name}</h2>
                 
 
+                <p className="mb-2 font-bold">Point to Rewards Ratio</p>
+                <p className="mb-2">{program.initial_earn_rate} Points : 1 {program.currency_name}</p>
+                <p className="mb-2 font-bold">Estimated Transfer Time</p>
+                <p className="mb-2">Up to {program.processing_time}</p>
                 
-                <p className="mb-2">{program.initial_earn_rate} points</p>
-                <p className="mb-2">{program.processing_time}</p>
                 <Link href={`/${program.id}`}>
                 <a>
-                <h2 className="text-lg bg-blue-300 rounded drop-shadow-sm px-4 ">Transfer credits</h2>
+                <h2 className="text-lg bg-blue-300 rounded drop-shadow-sm px-4   ">Transfer credits</h2>
                 </a>
                 </Link>
                

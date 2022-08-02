@@ -1,56 +1,107 @@
-import Program from '../components/program'
-import Layout from '../components/layout'
-import Link from 'next/dist/client/link'
-const axios = require('axios').default;
-import { useEffect,useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { signIn, useSession, signOut } from 'next-auth/react';
+import { useForm } from 'react-hook-form';
+import Layout from '../components/layout';
 
-export default function Home() {
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 
-   const [prog,setProg] = useState([])
-    useEffect(()=>{
-        displayProgram()
-    },[]) //runs the function once when the page is loaded
-    axios.defaults.baseURL="http://localhost:8080"
-    const displayProgram=async()=>{
-        //router.push('/validate')
-        // const response = await axios.post('/loyalty',data={
-        //     "programId":6,
-        //     "stringToTest":"1005610"
-        // })
+export default function LoginScreen() {
 
-        const response = await axios.get('/loyalty')
-        setProg(response.data); 
-        console.log(response.data);
-       
-    }
+  const { data: session } = useSession();
 
+  const router = useRouter();
+  const { redirect } = router.query;
+  const [username, setUsername]=useState();
+  const [password, setPassword]=useState();
 
-  return (
+ const {
+    handleSubmit,
+  
+    } = useForm();
+
+  useEffect(() => {
+    // if (session?.user) {
+    //   router.push(redirect || '/');
+    //   console.log(session)
+    // }
+    console.log(session)
     
-    <Layout>
-      <header>
-      <nav className="flex h-20 items-centre px-4 justify-between shadow-md bg-white">
-                    <Link href="/"> 
-                    
-                    <a className=" text-lg font-bold text-black ml-10 mt-5">50,000 available points</a>
-                    </Link>
-                    
-                    <div className='absolute ml-300   w-1 h-20 bg-gray-600'></div>
-                    <button className='absolute ml-300  px-4  h-20'>Check Transaction status </button>
-                    
-                    
-                    
-                </nav>
-      </header>
-    <h1 className='px-4 h-12 text-lg font-bold'>Offers</h1>
-    <div className='grid grid-cols-1 gap-3 md:grid-cols-4 lg:grid-cols'>
-      {prog.map((program)=>(
-        <Program program={program} key={program.PartnerCode}></Program>
-      ))}</div>
-      <hr className='w-full my-5'></hr>
-  </Layout>
-  )
+  }, [router, session, redirect]);
+  
+    const submitHandler = async () => {
+      try {
+        console.log(username)
+        const result = await signIn('credentials', {
+          redirect: false,
+          username,
+          password,
+        });
+
+        console.log('result: ' + result.error)
+
+        if(result==null){
+          toast.error("result.error");
+        }
+        else if (result.error) {
+          toast.error(result.error);
+        }
+
+        else{
+          router.push('/homepage/'+username);
+        }
+      } catch (err) {
+        toast.error(err);
+      }
+    };
+
+  if(session){
+   
+
+      return (
+        <>
+       Signed in as {session.user.name} <br />
+        <button onClick={() => signOut()}>Sign out</button>
+       </>
+      )
+      
+    
+
+  }
+
+  else{
+    return (
+      <Layout title='login'>
+          <form className='mx-auto max-w-screen-md' onSubmit={handleSubmit(submitHandler)}>
+              <h1 className='mb-4 text-xl'>Login</h1>
+              <div className='mb-4'>
+                  <label htmlFor='username'>Username</label>
+                  <input 
+                   className='w-full' id='username' autoFocus onChange={(e) => {
+                    setUsername(e.target.value);
+                  }}>
+  
+                  </input>
+                 
+  
+              </div>
+              <div className='mb-4'>
+                  <label htmlFor='password'>Password</label>
+                  <input type='password' 
+                 
+                   className='w-full' id='password' autoFocus onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}></input>
+                   
+  
+              </div>
+              <div className='mb-4'>
+                  <button className='primary-button'>Login</button>
+              </div>
+              
+          </form>
+      </Layout>
+    )
+  }
+  
 }
-
-
-

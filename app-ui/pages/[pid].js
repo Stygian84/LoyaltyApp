@@ -1,6 +1,9 @@
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Layout from '../components/layout'
+
 // export async function getStaticProps(context) {
 //   const programid = context.params.pid;
 //   try {
@@ -41,12 +44,16 @@ const RenderCreditRequest = ({ referenceDoc }) => {
   );
 };
 
-const Transaction = ({ props }) => {
+const Transaction = () => {
+  const {data:session}=useSession();
   const [program, setProgram] = useState({});
   const [creditToUse, setCreditToUse] = useState(0);
   const [rewardExpected, setRewardExpected] = useState(0);
+  const [membershipID, setMembershipID] = useState(0);
   const [referenceDoc, setReferenceDoc] = useState(null);
-  const user = 1;
+  const [errorResponse, setErrorResponse] = useState(null);
+  const [user, setUser]=useState([])
+  
   const router = useRouter();
   const getProgram = async () => {
     const { pid } = router.query;
@@ -57,46 +64,101 @@ const Transaction = ({ props }) => {
       console.log("Error", error);
     }
   };
+  
+  const getUser=async ()=> {
+        
+   
+    try{
+      const response = await axios.get(`/getUserbyEmail/${session?.user.email}`);
+      setUser(response.data[0]);
+
+    } catch (error) {
+      console.log("err", error);
+    
+    }
+
+}
   useEffect(() => {
-    getProgram();
-  }, [router]);
+    if(router.isReady){
+      getUser()
+      getProgram();
+    }
+    
+  },[router.isReady] );
 
   const initateTransaction = async () => {
-    try {
-      const data = {
-        userId: user,
-        creditToTransfer: parseFloat(creditToUse),
-        membershipId: "1005610",
-        programId: program.id,
-      };
-      const response = await axios.post("/initTransaction", (data = data));
-      setReferenceDoc(response.data);
-    } catch (error) {
-      console.log("err", error);
+
+    if(rewardExpected==0){
+      setErrorResponse("not enough credits")
     }
+
+    else{
+
+      try {
+        const data = {
+          userId: user.id,
+          creditToTransfer: parseFloat(creditToUse),
+          membershipId: membershipID,
+          programId: program.id,
+        };
+        const response = await axios.post("/initTransaction", (data = data));
+        setReferenceDoc(response.data);
+      } catch (error) {
+        console.log("err", error.response.data.error);
+        setReferenceDoc(null)
+        setErrorResponse(error.response.data.error)
+        
+      }
+
+    }
+   
   };
   const checkReward = async () => {
-    try {
-      const data = {
-        userId: user,
-        creditToTransfer: parseFloat(creditToUse),
-        membershipId: "1005610",
-        programId: program.id,
-      };
-      const response = await axios.post("/checkReward", (data = data));
-      setRewardExpected(response.data.Amount);
-    } catch (error) {
-      console.log("err", error);
+    if(user.credit_balance<creditToUse){
+      setRewardExpected(0);
     }
+
+    else{
+
+      try {
+        const data = {
+          userId: user.id,
+          creditToTransfer: parseFloat(creditToUse),
+          membershipId: membershipID,
+          programId: program.id,
+        };
+        const response = await axios.post("/checkReward", (data = data));
+        
+        setRewardExpected(response.data.Amount);
+      } catch (error) {
+        console.log("err", error);
+      }
+
+
+    }
+    
   };
 
   return (
+    <Layout>
     <div className="flex items-center justify-center max-w-7xl m-auto min-h-screen">
       <div className="flex flex-col items-center justify-center border-2 rounded-xl px-20 py-40 border-black">
         <h1 className="font-bold text-4xl mb-6">Transaction Page</h1>
 
         <ProgramSection program={program} />
+        <div className="mr-30" >
+         <label className="mr-2">Enter Membership ID: </label>
+          <input
+            
+            className="border-black border-2 rounded-sm mb-5 "
+            onChange={(e) => {
+              setMembershipID(e.target.value);
+            }}
+          />
+          </div>
+
         <div>
+         
           <label className="mr-2">credit to transfer:</label>
           <input
             type="number"
@@ -124,8 +186,10 @@ const Transaction = ({ props }) => {
           Submit Request
         </button>
         {referenceDoc && <RenderCreditRequest referenceDoc={referenceDoc} />}
+        <p>{errorResponse}</p>
       </div>
     </div>
+    </Layout>
   );
 };
 export default Transaction;
