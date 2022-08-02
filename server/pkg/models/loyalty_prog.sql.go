@@ -7,7 +7,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createLoyalty = `-- name: CreateLoyalty :one
@@ -24,7 +23,7 @@ type CreateLoyaltyParams struct {
 	Name               string  `json:"name"`
 	CurrencyName       string  `json:"currency_name"`
 	ProcessingTime     string  `json:"processing_time"`
-	Description        sql.NullString  `json:"description"`
+	Description        string  `json:"description"`
 	EnrollmentLink     string  `json:"enrollment_link"`
 	TermsConditionLink string  `json:"terms_condition_link"`
 	FormatRegex        string  `json:"format_regex"`

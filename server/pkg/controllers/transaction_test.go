@@ -120,7 +120,7 @@ func TestRewardCalCardTier(t *testing.T) {
 	}
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant float64 = 1000
@@ -181,7 +181,7 @@ func TestRewardCalNormal(t *testing.T) {
 	}
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant float64 = 1000
@@ -219,7 +219,7 @@ func TestAddOneTimePromo(t *testing.T) {
 
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant float64 = 1000
@@ -270,7 +270,7 @@ func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
 	}
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant float64 = 1000
@@ -307,7 +307,7 @@ func TestMultiplePromotions(t *testing.T) {
 
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant1 float64 = 1000
@@ -412,7 +412,7 @@ func TestMulRequireCardTierMatch(t *testing.T) {
 	}
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant float64 = 1000
@@ -458,7 +458,7 @@ func TestAddCardTier(t *testing.T) {
 	}
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 	var constant float64 = 1000
 	createPromoArgs := models.CreatePromotionParams{
@@ -495,7 +495,7 @@ func TestMulOnGoingPromo(t *testing.T) {
 	}
 	startDate, err := time.Parse("2006-01-02", "2022-07-01")
 	require.NoError(t, err)
-	endDate, err := time.Parse("2006-01-02", "2022-07-30")
+	endDate, err := time.Parse("2006-01-02", "2022-08-30")
 	require.NoError(t, err)
 
 	var constant float64 = 1000
