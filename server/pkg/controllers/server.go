@@ -37,7 +37,7 @@ func NewServer(store *models.Store) *Server{
   router.POST("/createUser",server.CreateUser)
   router.GET("/getUserbyUsername/:username", server.GetUserByUserName)
   router.GET("/getUserbyEmail/:email", server.GetUserByEmail)
-  	router.GET("/transaction_status/:id", server.GetAllCreditRequest)x
+  router.GET("/transaction_status/:id", server.GetAllCreditRequest)
   
   server.router=router
   return server

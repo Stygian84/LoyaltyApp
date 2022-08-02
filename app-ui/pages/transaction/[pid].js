@@ -1,22 +1,11 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import Layout from "../components/layout";
-import LabelContent from "../components/labelContent";
+import Layout from "../../components/layout";
+import LabelContent from "../../components/labelContent";
+import Nav from "../../components/Nav";
 import { useEffect, useState } from "react";
 
-// export async function getStaticProps(context) {
-//   const programid = context.params.pid;
-//   try {
-//     const response = await axios.get(`/loyalty${programid}`);
-//   } catch (error) {
-//     console.log("Error", error);
-//   }
-//
-//   return {
-//     props: {},
-//   };
-// }
 axios.defaults.baseURL = "http://localhost:8080";
 
 const ProgramSection = ({ program }) => {
@@ -53,6 +42,7 @@ const Transaction = () => {
   const [creditToUse, setCreditToUse] = useState(0);
   const [rewardExpected, setRewardExpected] = useState(0);
   const [membershipID, setMembershipID] = useState(0);
+  const [membershipValidMessage, setMembershipValidMessage] = useState(null);
   const [referenceDoc, setReferenceDoc] = useState(null);
   const [errorResponse, setErrorResponse] = useState(null);
   const [user, setUser] = useState([]);
@@ -70,7 +60,6 @@ const Transaction = () => {
 
   const getUser = async () => {
     try {
-      console.log("session", session);
       const response = await axios.get(
         `/getUserbyEmail/${session?.user.email}`
       );
@@ -102,6 +91,26 @@ const Transaction = () => {
       setErrorResponse(error.response.data.error);
     }
   };
+  const validateMembership = async () => {
+    try {
+      const data = {
+        programId: program.id,
+        stringToTest: membershipID,
+      };
+      const response = await axios.post(
+        "/loyalty/validateMembership",
+        (data = data)
+      );
+      setMembershipValidMessage(
+        `Membership ID is ${response.data.valid ? "valid" : "not valid"}`
+      );
+      setErrorResponse(null);
+    } catch (err) {
+      setErrorResponse(
+        "Please enter the right membership id and the amount of credit to transfer"
+      );
+    }
+  };
   const checkReward = async () => {
     if (user.credit_balance < creditToUse) {
       setRewardExpected(0);
@@ -116,45 +125,69 @@ const Transaction = () => {
         const response = await axios.post("/checkReward", (data = data));
 
         setRewardExpected(response.data.Amount);
+        setErrorResponse(null);
       } catch (error) {
+        setErrorResponse(
+          "Please enter the right membership id and the amount of credit to transfer"
+        );
         console.log("err", error);
       }
     }
   };
 
   return (
-    <Layout>
+    <Layout title={"Transaction"}>
+      <Nav />
       <div className="flex items-center justify-center max-w-7xl m-auto min-h-screen">
         <div className="flex flex-col items-center justify-center border-2 rounded-xl px-20 py-40 border-black">
           <h1 className="font-bold text-4xl mb-6">Transaction Page</h1>
 
           <ProgramSection program={program} />
-          <div className="mr-30">
-            <label className="mr-2">Enter Membership ID: </label>
-            <input
-              className="border-black border-2 rounded-sm mb-5 "
-              onChange={(e) => {
-                setMembershipID(e.target.value);
-              }}
-            />
-          </div>
+          <LabelContent title={"Enter Membership ID"}>
+            <div>
+              {" "}
+              <input
+                className="border-black border-1 rounded-sm  "
+                onChange={(e) => {
+                  setMembershipID(e.target.value);
+                }}
+              />
+              <button
+                className="ml-2 font-bold w-auto h-auto bg-sky-300 p-2 "
+                onClick={validateMembership}
+              >
+                Valid Membership
+              </button>
+              {membershipValidMessage && (
+                <p className="text-red-500 font-2xl text-center">
+                  {membershipValidMessage}
+                </p>
+              )}
+            </div>
+          </LabelContent>
+          <LabelContent title={"Credit to transfer"}>
+            <div>
+              {" "}
+              <input
+                type="number"
+                className="border-black border-1 rounded-sm"
+                onChange={(e) => {
+                  setCreditToUse(e.target.value);
+                }}
+              />
+              <button
+                className="ml-2 font-bold w-auto h-auto bg-sky-300 p-2 "
+                onClick={checkReward}
+              >
+                Check Reward
+              </button>
+            </div>
+          </LabelContent>
 
-          <div>
-            <label className="mr-2">credit to transfer:</label>
-            <input
-              type="number"
-              className="border-black border-2 rounded-sm"
-              onChange={(e) => {
-                setCreditToUse(e.target.value);
-              }}
-            />
-            <button
-              className="font-bold w-auto h-auto bg-sky-300 p-2 mt-4"
-              onClick={checkReward}
-            >
-              Check Reward
-            </button>
-          </div>
+          {errorResponse && (
+            <p className="text-red-500 font-2xl text-center">{errorResponse}</p>
+          )}
+
           {rewardExpected != 0 && (
             <p className="text-red-500 font-2xl">
               your reward expected is: {rewardExpected}
@@ -167,7 +200,6 @@ const Transaction = () => {
             Submit Request
           </button>
           {referenceDoc && <RenderCreditRequest referenceDoc={referenceDoc} />}
-          <p>{errorResponse}</p>
         </div>
       </div>
     </Layout>

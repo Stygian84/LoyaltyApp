@@ -31,7 +31,7 @@ const Program = ({ program }) => {
                 <LabelContent title="Estimated Transfer Time">
                     <p className="">Up to {program.processing_time}</p>
                 </LabelContent>
-                <Link href={`/${program.id}`}>
+                <Link href={`/transaction/${program.id}`}>
                     <button className="mt-4 text-lg cursor-pointer bg-blue-300 rounded drop-shadow-sm px-4 ">
                         <p>Transfer credits</p>
                     </button>
