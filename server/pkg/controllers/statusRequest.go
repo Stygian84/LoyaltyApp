@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"context"
 	"esc/ascendaRoyaltyPoint/pkg/models"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,9 +10,11 @@ import (
 )
 
 type TransStatus struct {
-	CreditRequestId   int32  `json:"credit_request_id"`
-	TransactionStatus string `json:"transaction_status"`
-	ProgramId         int32  `json:"program"`
+	CreditRequestId   int32   `json:"credit_request_id"`
+	TransactionStatus string  `json:"transaction_status"`
+	Program           string  `json:"program"`
+	CreditUsed        float64 `json:"credit_used"`
+	CreditToReceive   float64 `json:"credit_to_receive"`
 }
 
 // get all transaction status from user
@@ -31,15 +33,19 @@ func (server *Server) GetAllCreditRequest(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No request found"})
 		return
 	}
-	result := GetTransStatus(userRequests)
-	fmt.Println(result)
+
+	result := GetTransStatus(userRequests, server.store.Queries)
 	c.JSON(http.StatusOK, result)
 }
 
-func GetTransStatus(creditRequests []models.CreditRequest) []TransStatus {
+func GetTransStatus(creditRequests []models.CreditRequest, server *models.Queries) []TransStatus {
 	var result []TransStatus
 	for _, creditRequest := range creditRequests {
-		result = append(result, TransStatus{CreditRequestId: int32(creditRequest.ReferenceNumber), TransactionStatus: string(creditRequest.TransactionStatus), ProgramId: creditRequest.Program})
+		program, _ := server.GetLoyaltyByID(context.Background(), int64(creditRequest.Program))
+		// if err != nil {
+		// 	return result
+		// }
+		result = append(result, TransStatus{CreditRequestId: int32(creditRequest.ReferenceNumber), TransactionStatus: string(creditRequest.TransactionStatus), Program: program.Name, CreditUsed: creditRequest.CreditUsed, CreditToReceive: creditRequest.RewardShouldReceive})
 	}
 	return result
 }
