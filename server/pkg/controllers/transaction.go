@@ -39,6 +39,7 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 		return 0, sql.NullInt32{Valid: false}, nil
 	}
 
+
 	user, err := query.GetUserByID(c, int64(body.UserId))
 	if err != nil {
 		return 0, sql.NullInt32{Valid: false}, nil
@@ -87,7 +88,6 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 	} else {
 		return max, sql.NullInt32{Valid: false}, nil
 	}
-
 }
 
 func (server *Server) CheckRewardRate(c *gin.Context) {
@@ -97,13 +97,13 @@ func (server *Server) CheckRewardRate(c *gin.Context) {
 		return
 	}
 
+
 	amount, _, err := CalculateReward(c, server.store.Queries, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"Amount": amount})
-
 }
 
 func (server *Server) CreateTransaction(c *gin.Context) {
