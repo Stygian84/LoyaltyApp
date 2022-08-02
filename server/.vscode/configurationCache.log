@@ -1,0 +1,1 @@
+{"buildTargets":["docker-postgres","migrate","migrate-down","migrations","sqlc","test-controllers","test-model"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

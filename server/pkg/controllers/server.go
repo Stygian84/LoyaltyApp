@@ -1,19 +1,23 @@
 package controllers
 
+
 import(
   "esc/ascendaRoyaltyPoint/pkg/models"
   "github.com/gin-contrib/cors"
   "github.com/gin-gonic/gin"
+
 )
-type Server struct{
-  store *models.Store
-  router *gin.Engine
+
+type Server struct {
+	store  *models.Store
+	router *gin.Engine
 }
 
-func (server *Server) Start(address string)error{
-  return server.router.Run(address)
+func (server *Server) Start(address string) error {
+	return server.router.Run(address)
 
 }
+
 
 func NewServer(store *models.Store) *Server{
   server := &Server{
@@ -30,6 +34,12 @@ func NewServer(store *models.Store) *Server{
   router.GET("/loyalty", server.GetLoyalty)
   router.GET("/loyalty/:id", server.GetLoyaltyId)
   router.POST("/checkReward",server.CheckRewardRate)
+  router.POST("/createUser",server.CreateUser)
+  router.GET("/getUserbyUsername/:username", server.GetUserByUserName)
+  router.GET("/getUserbyEmail/:email", server.GetUserByEmail)
+  router.GET("/transaction_status/:id", server.GetAllCreditRequest)
+  
   server.router=router
   return server
+
 }

@@ -29,7 +29,7 @@ func createUserObject(carTier sql.NullInt32) models.CreateUserParams {
 	arg := models.CreateUserParams{
 		FullName:      sql.NullString{Valid: true, String: utils.RandomString(6)},
 		CreditBalance: 2000,
-		Email:         utils.RandomString(20),
+		Email:         utils.RandomString(6),
 		Contact:       sql.NullInt32{Valid: false},
 		Password:      utils.RandomString(10),
 		UserName:      utils.RandomString(5),
