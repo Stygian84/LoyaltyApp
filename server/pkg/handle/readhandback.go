@@ -162,7 +162,7 @@ func sendEmail(email_to string, approved bool, user_name string, reference_numbe
 			"Transaction Status : %v \n", user_name, reference_number, int(user_id), user_name, reference_number, user_balance, credit_used, status)
 	} else {
 		subject = "Subject: Your transaction has been rejected\n"
-		body = fmt.Sprintf("Dear %v , \n\n Your transaction with reference number %v has been rejected. \n\n"+
+		body = fmt.Sprintf("Dear %v , \n\nYour transaction with reference number %v has been rejected. \n\n"+
 			"The transaction details are as folllows : \n"+
 			"User ID : %v \n"+
 			"User Name : %v \n"+
