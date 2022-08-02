@@ -91,7 +91,6 @@ var DownloadHandback = func() {
 	conn.Close()
 	sc.Close()
 
-	return
 }
 
 type remoteFiles struct {
