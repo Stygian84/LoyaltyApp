@@ -103,7 +103,7 @@ func SendAccrual() (err error) {
 	}
 
 	// Upload csv files to sftp server
-	UploadAccrual("./temp", "./accrual/")
+	UploadAccrual("./temp/", "./accrual/")
 
 	// Delete temp folder containing newly created csv file for transfer
 	err = os.RemoveAll("./temp")

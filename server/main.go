@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	go handle.RunCron("01:00", "03:00")
+	go handle.RunCron("09:28", "09:29")
 
 	config.Connect()
 	db := config.GetDB()
