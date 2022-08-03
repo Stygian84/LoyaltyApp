@@ -201,6 +201,7 @@ func TestRewardCalNormal(t *testing.T) {
 	require.Equal(t, expected, result)
 
 }
+
 // add with one time promo, when promo is not used
 func TestAddOneTimePromo(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
@@ -248,10 +249,9 @@ func TestAddOneTimePromo(t *testing.T) {
 	require.NoError(t, err)
 	result, _, err := CalculateReward(context.Background(), testQueries, args)
 	require.NoError(t, err)
-	expected := creditToTransfer*(program.InitialEarnRate) 
+	expected := creditToTransfer * (program.InitialEarnRate)
 	require.Equal(t, expected, result)
 }
-
 
 // Test for Mul One Time Promotion with Previous Credit Request
 func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
@@ -289,6 +289,7 @@ func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
 	expected := creditToTransfer * (program.InitialEarnRate)
 	require.Equal(t, result, expected)
 }
+
 // test when there is multiple promotion going on, take the one with greatest return
 func TestMultiplePromotions(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
@@ -433,6 +434,7 @@ func TestMulRequireCardTierMatch(t *testing.T) {
 	expected := creditToTransfer * (program.InitialEarnRate) * constant
 	require.Equal(t, result, expected)
 }
+
 // add when there is a card tier requirement for promo, when user card tier == promo card tier
 func TestAddCardTier(t *testing.T) {
 	createCardTierArgs := models.CreateCardTierParams{
@@ -474,7 +476,7 @@ func TestAddCardTier(t *testing.T) {
 	require.NoError(t, err)
 	result, _, err := CalculateReward(context.Background(), testQueries, args)
 	require.NoError(t, err)
-	expected := creditToTransfer * (program.InitialEarnRate)+constant
+	expected := creditToTransfer*(program.InitialEarnRate) + constant
 	require.Equal(t, result, expected)
 }
 

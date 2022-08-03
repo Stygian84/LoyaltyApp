@@ -1,5 +1,6 @@
-make: Entering directory 'c:/Users/varsh/Documents/ESC_C4G2'
-make: Leaving directory 'c:/Users/varsh/Documents/ESC_C4G2'
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'c:/Users/Nicholas/Desktop/escc4g2/ESC_C4G2'
+make: Leaving directory 'c:/Users/Nicholas/Desktop/escc4g2/ESC_C4G2'
  
 make: *** No targets specified and no makefile found.  Stop.
 
