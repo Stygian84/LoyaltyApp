@@ -19,7 +19,7 @@ func createLoyaltyObject() models.CreateLoyaltyParams {
 		Description:        utils.RandomString(20),
 		EnrollmentLink:     utils.RandomString(20),
 		TermsConditionLink: utils.RandomString(20),
-		FormatRegex:        "100\\d{4}$",
+		FormatRegex:        "^100\\d{4}$",
 		PartnerCode:        utils.RandomString(5),
 		InitialEarnRate:    utils.RandomFloat(10),
 	}

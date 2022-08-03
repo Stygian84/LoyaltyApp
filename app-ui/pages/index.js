@@ -38,7 +38,7 @@ export default function LoginScreen() {
       } else if (result.error) {
         toast.error(result.error);
       } else {
-        router.push("/homepage/" + username);
+        router.push("/homepage");
       }
     } catch (err) {
       toast.error(err);
@@ -84,7 +84,10 @@ export default function LoginScreen() {
             ></input>
           </div>
           <div className="flex justify-center mb-4">
-            <button className="font-bold w-auto rounded-xl h-auto bg-sky-300 py-2 px-6 mt-4">
+            <button
+              className="font-bold w-auto rounded-xl h-auto bg-sky-300 py-2 px-6 mt-4"
+              id="loginButton"
+            >
               Login
             </button>
           </div>

@@ -26,8 +26,8 @@ const ProgramSection = ({ program }) => {
 
 const RenderCreditRequest = ({ referenceDoc }) => {
   return (
-    <div className="text-center">
-      <h1>Refernce Number: {referenceDoc.reference_number}</h1>
+    <div className="text-center" id="referenceDoc">
+      <h1>Reference Number: {referenceDoc.reference_number}</h1>
       <h3>Transaction Time: {referenceDoc.transaction_time.Time}</h3>
       <p>Credit Used: {referenceDoc.credit_used}</p>
       <p>Reward Expected: {referenceDoc.reward_should_receive}</p>
@@ -148,18 +148,23 @@ const Transaction = () => {
               {" "}
               <input
                 className="border-black border-1 rounded-sm  "
+                id="membershipID"
                 onChange={(e) => {
                   setMembershipID(e.target.value);
                 }}
               />
               <button
                 className="ml-2 font-bold w-auto h-auto bg-sky-300 p-2 "
+                id="membershipIDButton"
                 onClick={validateMembership}
               >
                 Valid Membership
               </button>
               {membershipValidMessage && (
-                <p className="text-red-500 font-2xl text-center">
+                <p
+                  className="text-red-500 font-2xl text-center"
+                  id="membershipValidity"
+                >
                   {membershipValidMessage}
                 </p>
               )}
@@ -171,12 +176,14 @@ const Transaction = () => {
               <input
                 type="number"
                 className="border-black border-1 rounded-sm"
+                id="creditInput"
                 onChange={(e) => {
                   setCreditToUse(e.target.value);
                 }}
               />
               <button
                 className="ml-2 font-bold w-auto h-auto bg-sky-300 p-2 "
+                id="creditInputButton"
                 onClick={checkReward}
               >
                 Check Reward
@@ -189,12 +196,13 @@ const Transaction = () => {
           )}
 
           {rewardExpected != 0 && (
-            <p className="text-red-500 font-2xl">
-              your reward expected is: {rewardExpected}
+            <p className="text-red-500 font-2xl" id="expectedReward">
+              Your reward expected is: {rewardExpected}
             </p>
           )}
           <button
             className="font-bold w-auto h-auto bg-sky-300 p-2 mt-4"
+            id="submitCreditRequest"
             onClick={initateTransaction}
           >
             Submit Request

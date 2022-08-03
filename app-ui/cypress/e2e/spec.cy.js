@@ -1,20 +1,63 @@
+const userName = "xezjg";
 describe("displaying page", () => {
   it("should contain the right number of elements ", () => {
     cy.visit("http://localhost:3000");
+    cy.get("#username").type(userName);
+    cy.get("#password").type("nvkyebbnns");
+    cy.get("#loginButton").click();
+
     cy.get(".card").each(($el, index, $list) => {
       cy.wrap($el).children().children().should("have.length", 5);
     });
   });
   it("should contain a transfer credit button", () => {
-    cy.visit("http://localhost:3000");
+    // cy.visit("http://localhost:3000");
     cy.get(".card").each(($el, index, $list) => {
       cy.wrap($el).get("div> div>button").contains("Transfer credits");
     });
   });
   it("should display the right number of cards", () => {
-    cy.visit("http://localhost:3000");
+    // cy.visit("http://localhost:3000");
     cy.request("http://localhost:8080/loyalty").then((response) => {
       cy.get(".card").should("have.length", response.body.length);
     });
+  });
+});
+describe("transfer credit", () => {
+  const creditValue = 20;
+  it("should navigate to transaction page and validate an invalid membership id", () => {
+    cy.get(".card:first>div>button").click();
+    cy.get("#membershipID").type("100561");
+    cy.get("#membershipIDButton").click();
+    cy.get("#membershipValidity").contains("Membership ID is not valid");
+  });
+  it("should validate an valid membership id", () => {
+    cy.get("#membershipID").clear().type("1005610");
+    cy.get("#membershipIDButton").click();
+    cy.get("#membershipValidity").contains("Membership ID is valid");
+  });
+  it("Should check reward", () => {
+    cy.get("#creditInput").type(creditValue);
+    cy.get("#creditInputButton").click();
+    cy.get("#expectedReward").contains("Your reward expected is: ");
+  });
+  it("should submit credit request", () => {
+    cy.get("#submitCreditRequest").click();
+    cy.get("#referenceDoc")
+      .children()
+      .should(($el) => {
+        expect($el).to.have.length(5);
+        expect($el.first().text()).to.match(/^Reference Number: \d{2,3}$/);
+      });
+  });
+  it("should update the balance", () => {
+    cy.request(`http://localhost:8080/getUserbyUsername/${userName}`).then(
+      (response) => {
+        cy.get("#balance").should(
+          "have.text",
+          response.body.credit_balance + creditValue
+        );
+      }
+    );
   });
 });

@@ -1,12 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
-import React, { useContext, useEffect, useState } from "react";
-
-import { useRouter } from "next/router";
 
 export default function Layout({ title, children }) {
-  const router = useRouter();
-
   return (
     <>
       <Head>

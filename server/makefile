@@ -16,6 +16,13 @@ test-model:
 
 test-controllers:
 	go test esc/ascendaRoyaltyPoint/pkg/controllers -v -cover
+	# go test esc/ascendaRoyaltyPoint/pkg/controllers -fuzz=FuzzCalRewards -fuzztime=15s
+	# go test esc/ascendaRoyaltyPoint/pkg/controllers -fuzz=FuzzMulOnGoingPromo -fuzztime=15s
+	
 
 sqlc:
 	sqlc generate
+
+test-handle:
+	go test esc/ascendaRoyaltyPoint/pkg/handle -timeout=100s -v -cover
+

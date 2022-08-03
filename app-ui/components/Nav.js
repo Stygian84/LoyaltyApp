@@ -25,7 +25,10 @@ export default function Nav() {
   return (
     <nav className="flex h-20 items-centre px-3 justify-around shadow-md bg-white">
       <div className=" text-lg font-bold text-black flex justify-center items-center">
-        {user?.credit_balance} available points
+        <p id="balance" className="mr-4">
+          {user?.credit_balance}
+        </p>
+        available points
       </div>
 
       <div className=" w-1 h-20 bg-gray-600"> </div>
