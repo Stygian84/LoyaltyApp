@@ -1,9 +1,9 @@
-const userName = "xezjg";
+const userName = "gracecole";
 describe("displaying page", () => {
   it("should contain the right number of elements ", () => {
     cy.visit("http://localhost:3000");
     cy.get("#username").type(userName);
-    cy.get("#password").type("nvkyebbnns");
+    cy.get("#password").type("password");
     cy.get("#loginButton").click();
 
     cy.get(".card").each(($el, index, $list) => {
@@ -61,3 +61,27 @@ describe("transfer credit", () => {
     );
   });
 });
+
+describe("transaction status page", () => {
+  it("go to trasaction status page ", () => {
+    cy.go('back');
+    cy.get("#transactionPageButton").click();
+
+  });
+
+  it("display correct number of status", () => {
+    cy.request(`http://localhost:8080/getUserbyUsername/${userName}`).then((response) => {
+      cy.request(`http://localhost:8080/transaction_status/${response.body.id}`).then((response) => {
+        cy.get(".card").should("have.length", response.body.length);
+      }
+      
+  )});
+
+  })
+
+  it("correct number of elements in status", ()=>{
+    cy.get(".card").each(($el, index, $list) => {
+      cy.wrap($el).children().children().should("have.length", 8);
+    });
+  })
+})

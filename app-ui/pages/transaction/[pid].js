@@ -76,6 +76,13 @@ const Transaction = () => {
   }, [router.isReady, session]);
 
   const initateTransaction = async () => {
+    checkReward();
+    if(rewardExpected==0){
+      setErrorResponse('You do not have sufficient credits to initiate this transaction')
+    }
+    else{
+
+    
     try {
       const data = {
         userId: user.id,
@@ -90,6 +97,7 @@ const Transaction = () => {
       setReferenceDoc(null);
       setErrorResponse(error.response.data.error);
     }
+  }
   };
   const validateMembership = async () => {
     try {

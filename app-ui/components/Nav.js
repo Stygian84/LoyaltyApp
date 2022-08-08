@@ -34,7 +34,7 @@ export default function Nav() {
       <div className=" w-1 h-20 bg-gray-600"> </div>
       <div className="flex justify-center items-center">
         <Link href="/status" className="  px-4  h-20">
-          <p className="text-lg font-bold cursor-pointer">
+          <p id ="transactionPageButton"className="text-lg font-bold cursor-pointer">
             Check Transaction status
           </p>
         </Link>

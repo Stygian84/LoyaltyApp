@@ -47,4 +47,19 @@ func (server *Server) GetUserByUserName(c *gin.Context){
 	
 	c.JSON(http.StatusOK,users)
   }
+
+  func (server *Server) CreateCardTier(c *gin.Context){
+	card_tier := &models.CreateCardTierParams{}
+	  if err := c.ShouldBindJSON(card_tier); err != nil {
+		  c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		  return
+	  }
+	  
+	  cardTierCreated,err:=server.store.Queries.CreateCardTier(c,*card_tier)
+	  if err!=nil{
+		  c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		  return
+	  }
+	  c.JSON(http.StatusCreated,cardTierCreated)
+  }
   

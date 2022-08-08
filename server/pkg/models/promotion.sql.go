@@ -28,7 +28,7 @@ type CreatePromotionParams struct {
 	EndDate           time.Time        `json:"end_date"`
 	EarnRateType      EarnRateTypeEnum `json:"earn_rate_type"`
 	Constant          float64          `json:"constant"`
-	CardTier          sql.NullInt32    `json:"card_tier"`
+	CardTier          int32            `json:"card_tier"`
 	LoyaltyMembership sql.NullInt32    `json:"loyalty_membership"`
 }
 
@@ -229,7 +229,7 @@ type UpdatePromotionParams struct {
 	EndDate           time.Time        `json:"end_date"`
 	EarnRateType      EarnRateTypeEnum `json:"earn_rate_type"`
 	Constant          float64          `json:"constant"`
-	CardTier          sql.NullInt32    `json:"card_tier"`
+	CardTier          int32            `json:"card_tier"`
 	LoyaltyMembership sql.NullInt32    `json:"loyalty_membership"`
 	ID                int64            `json:"id"`
 }

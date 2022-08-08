@@ -114,18 +114,18 @@ type Promotion struct {
 	EndDate           time.Time        `json:"end_date"`
 	EarnRateType      EarnRateTypeEnum `json:"earn_rate_type"`
 	Constant          float64          `json:"constant"`
-	CardTier          sql.NullInt32    `json:"card_tier"`
+	CardTier          int32            `json:"card_tier"`
 	LoyaltyMembership sql.NullInt32    `json:"loyalty_membership"`
 }
 
 type User struct {
-	ID            int64          `json:"id"`
-	FullName      sql.NullString `json:"full_name"`
-	CreditBalance float64        `json:"credit_balance"`
-	Email         string         `json:"email"`
-	Contact       sql.NullInt32  `json:"contact"`
-	Password      string         `json:"password"`
-	UserName      string         `json:"user_name"`
-	CardTier      sql.NullInt32  `json:"card_tier"`
-	CreatedAt     sql.NullTime   `json:"created_at"`
+	ID            int64        `json:"id"`
+	FullName      string       `json:"full_name"`
+	CreditBalance float64      `json:"credit_balance"`
+	Email         string       `json:"email"`
+	Contact       int32        `json:"contact"`
+	Password      string       `json:"password"`
+	UserName      string       `json:"user_name"`
+	CardTier      int32        `json:"card_tier"`
+	CreatedAt     sql.NullTime `json:"created_at"`
 }

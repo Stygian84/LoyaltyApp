@@ -14,7 +14,7 @@ export default function Status({status}){
             break;
     }
     return(
-        <div className="flex place-content-between border-2 rounded-xl px-5 py-5 my-5 mx-2 border-black">
+        <div className="card flex place-content-between border-2 rounded-xl px-5 py-5 my-5 mx-2 border-black">
             <div className="">
                 <p className="font-bold">{status.program}</p>
                 <br></br>

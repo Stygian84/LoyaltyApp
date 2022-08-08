@@ -38,6 +38,9 @@ func NewServer(store *models.Store) *Server{
   router.GET("/getUserbyUsername/:username", server.GetUserByUserName)
   router.GET("/getUserbyEmail/:email", server.GetUserByEmail)
   router.GET("/transaction_status/:id", server.GetAllCreditRequest)
+  router.POST("/createCardTier", server.CreateCardTier)
+  router.POST("/createPromo",server.CreatePromo)
+  router.GET("/listPromo", server.GetPromoList)
   
   server.router=router
   return server

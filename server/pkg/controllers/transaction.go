@@ -39,7 +39,6 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 		return 0, sql.NullInt32{Valid: false}, nil
 	}
 
-
 	user, err := query.GetUserByID(c, int64(body.UserId))
 	if err != nil {
 		return 0, sql.NullInt32{Valid: false}, nil
@@ -54,23 +53,23 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 				Program:   int32(program.ID),
 				PromoUsed: sql.NullInt32{Valid: true, Int32: int32(promotion.ID)},
 			}
-			_, err = query.GetCreditRequestByPromo(c, args)
-
-			//skip the loop if there is result found
-			// if err.Error()!="sql: no rows in result set"{
-			if err != sql.ErrNoRows {
-				fmt.Println("no pass request made")
+			request, err := query.GetCreditRequestByPromo(c, args)
+			fmt.Println(len(request))
+			if len(request) > 0 {
 				continue
 			}
+			//skip the loop if there is result found
+
+			if err != nil {
+				fmt.Println(err)
+
+			}
+
 		}
 
-		if promotion.CardTier.Valid && user.CardTier.Valid {
-			if promotion.CardTier.Int32 == user.CardTier.Int32 {
-				tempReward = processReward(promotion, base)
-			}
-		} else if promotion.CardTier.Valid {
-			continue
-
+		fmt.Println(promotion.CardTier + ' ' + user.CardTier)
+		if promotion.CardTier == user.CardTier {
+			tempReward = processReward(promotion, base)
 		} else {
 			tempReward = processReward(promotion, base)
 
@@ -96,7 +95,6 @@ func (server *Server) CheckRewardRate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 
 	amount, _, err := CalculateReward(c, server.store.Queries, body)
 	if err != nil {

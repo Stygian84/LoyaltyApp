@@ -8,12 +8,10 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun Jul 31 23:34:49 2022
+# Make data base, printed on Sun Aug 07 20:45:47 2022
 
 # Variables
 
-# environment
-FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
 SYSTEMDRIVE = C:
 # environment
@@ -25,11 +23,9 @@ VBOX_MSI_INSTALL_PATH = C:\Program Files\Oracle\VirtualBox\
 # makefile (from '.env', line 1)
 PSQL_LINK = postgres://postgres:Hanam&k1@localhost:5432/esc?sslmode=disable
 # environment
-LOCAL_GIT_DIRECTORY = C:\Users\varsh\AppData\Local\GitHubDesktop\app-3.0.5\resources\app\git
-# environment
 LOCALAPPDATA = C:\Users\varsh\AppData\Local
 # environment
-VSCODE_CWD = C:\Users\varsh\AppData\Local\GitHubDesktop\app-3.0.5
+VSCODE_CWD = C:\WINDOWS\system32
 # environment
 CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
 # environment
@@ -47,9 +43,7 @@ GOPATH = C:\Users\varsh\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_16628_XVHGPPVEPGHCIYUF
-# environment
-FPS_BROWSER_USER_PROFILE_STRING = Default
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_32328_OPWXTRGKGNPFYEUS
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -61,7 +55,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\varsh\AppData\Roaming\Code\CachedData\3b889b090b5ad5793f524b5d1d39fda662b96a2a
+VSCODE_CODE_CACHE_PATH = C:\Users\varsh\AppData\Roaming\Code\CachedData\da76f93349a72022ca4670c1b84860304616aaa2
 # environment
 LANG = C
 # default
@@ -97,7 +91,7 @@ MAKEFILE_LIST := makefile .env
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 16628
+VSCODE_PID = 32328
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -129,7 +123,7 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = C:\Program Files (x86)\VMware\VMware Player\bin\;C:\Python310\Scripts\;C:\Python310\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\Pulse Secure\VC142.CRT\X64\;C:\Program Files (x86)\Pulse Secure\VC142.CRT\X86\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files (x86)\Common Files\Acronis\VirtualFile\;C:\Program Files (x86)\Common Files\Acronis\VirtualFile64\;C:\Program Files (x86)\Common Files\Acronis\FileProtector\;C:\Program Files (x86)\Common Files\Acronis\FileProtector64\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Users\varsh\anaconda3\Scripts;C:\Users\varsh\anaconda3\Library\bin;C:\Users\varsh\anaconda3;;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\nodejs\;C:\Program Files\Go\bin;C:\Ruby31-x64\bin;C:\Users\varsh\scoop\shims;C:\Users\varsh\AppData\Local\Microsoft\WindowsApps;C:\Users\varsh\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\varsh\AppData\Local\GitHubDesktop\bin;C:\src\flutter\bin;C:\Users\varsh\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\Users\varsh\AppData\Roaming\npm;C:\Users\varsh\go\bin;C:\Program Files\MongoDB\Server\5.0\bin
+PATH = C:\Program Files (x86)\VMware\VMware Player\bin\;C:\Python310\Scripts\;C:\Python310\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\Pulse Secure\VC142.CRT\X64\;C:\Program Files (x86)\Pulse Secure\VC142.CRT\X86\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files (x86)\Common Files\Acronis\VirtualFile\;C:\Program Files (x86)\Common Files\Acronis\VirtualFile64\;C:\Program Files (x86)\Common Files\Acronis\FileProtector\;C:\Program Files (x86)\Common Files\Acronis\FileProtector64\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Users\varsh\anaconda3\Scripts;C:\Users\varsh\anaconda3\Library\bin;C:\Users\varsh\anaconda3;;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\nodejs\;C:\Program Files\Go\bin;C:\Ruby31-x64\bin;C:\Users\varsh\scoop\shims;C:\Users\varsh\AppData\Local\Microsoft\WindowsApps;C:\Users\varsh\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\varsh\AppData\Local\GitHubDesktop\bin;C:\src\flutter\bin;C:\Users\varsh\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\Users\varsh\AppData\Roaming\npm;C:\Users\varsh\go\bin;C:\Program Files\MongoDB\Server\5.0\bin;C:\Users\varsh\AppData\Local\Cypress\Cache\10.3.1\Cypress\Cypress.exe;
 # environment
 ZES_ENABLE_SYSMAN = 1
 # environment
@@ -166,6 +160,8 @@ USERDOMAIN = DESKTOP-0GKQMLI
 GNUMAKEFLAGS := 
 # environment
 OS = Windows_NT
+# environment
+__COMPAT_LAYER = DetectorsAppHealth
 # makefile
 .DEFAULT_GOAL := docker-postgres
 # default
@@ -195,7 +191,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\varsh\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\fafe850906efe9229e2cdd12855dde84-1.69.2-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\fafe850906efe9229e2cdd12855dde84-1.70.0-main-sock
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # default
@@ -208,10 +204,6 @@ SUFFIXES :=
 ALLUSERSPROFILE = C:\ProgramData
 # environment
 SESSIONNAME = Console
-# environment
-VSCODE_CLI = 1
-# environment
-ELECTRON_NO_ATTACH_CONSOLE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync load
 # environment
@@ -219,7 +211,7 @@ PROCESSOR_REVISION = 8c01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 140 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=103/1024=10%, Rehash=0, Collisions=10/132=8%
+# Load=99/1024=10%, Rehash=0, Collisions=9/128=7%
 
 # Pattern-specific Variable Values
 
@@ -227,7 +219,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 140 Stepping 1, GenuineIntel
 
 # Directories
 
-# . (key c:/Users/varsh/Documents/ESC_C4G2/server, mtime 1659250388): 11 files, no impossibilities.
+# . (key c:/Users/varsh/Documents/ESC_C4G2/server, mtime 1659495928): 11 files, no impossibilities.
 
 # 11 files, no impossibilities in 1 directories.
 
@@ -245,12 +237,22 @@ migrations:
 	@read -p "Enter the name of the migration: " migration_name;\
 	migrate create -ext sql -dir pkg/models/migrations -seq $$migration_name
 
+test-handle:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 27):
+	go test esc/ascendaRoyaltyPoint/pkg/handle -timeout=100s -v -cover
+
 test-controllers:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 #  recipe to execute (from 'makefile', line 18):
 	go test esc/ascendaRoyaltyPoint/pkg/controllers -v -cover
+	# go test esc/ascendaRoyaltyPoint/pkg/controllers -fuzz=FuzzCalRewards -fuzztime=15s
+	# go test esc/ascendaRoyaltyPoint/pkg/controllers -fuzz=FuzzMulOnGoingPromo -fuzztime=15s
+	
 
 # Not a target:
 .env:
@@ -290,7 +292,7 @@ sqlc:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 21):
+#  recipe to execute (from 'makefile', line 24):
 	sqlc generate
 
 test-model:
@@ -303,7 +305,7 @@ test-model:
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-27 14:25:11
+#  Last modified 2022-08-03 11:05:28
 #  File has been updated.
 #  Successfully updated.
 
@@ -315,19 +317,19 @@ migrate-down:
 	migrate -source file://pkg/models/migrations -database "${PSQL_LINK}" down 
 
 # files hash-table stats:
-# Load=12/1024=1%, Rehash=0, Collisions=0/23=0%
+# Load=13/1024=1%, Rehash=0, Collisions=0/24=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 21 / storage = 178 B / avg = 8 B
-# current buf: size = 8174 B / used = 178 B / count = 21 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 22 / storage = 190 B / avg = 8 B
+# current buf: size = 8174 B / used = 190 B / count = 22 / avg = 8 B
 
-# strcache performance: lookups = 34 / hit rate = 38%
+# strcache performance: lookups = 36 / hit rate = 38%
 # hash-table stats:
-# Load=21/8192=0%, Rehash=0, Collisions=0/34=0%
-# Finished Make data base on Sun Jul 31 23:34:49 2022
+# Load=22/8192=0%, Rehash=0, Collisions=0/36=0%
+# Finished Make data base on Sun Aug 07 20:45:47 2022
 
  

@@ -75,7 +75,7 @@ func SendAccrual() (err error) {
 			member_id := credit_request_details.MemberID
 			credit_used := credit_request_details.CreditUsed
 			user_details, _ := Queries.GetUserByID(context.Background(), int64(user_id))
-			full_name := user_details.FullName.String
+			full_name := user_details.FullName
 			transfer_date := time.Now().Format("2006-01-02")
 			reference_number := credit_request_details.ReferenceNumber
 			// program_id := credit_request_details.Program

@@ -7,7 +7,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -21,13 +20,13 @@ RETURNING id, full_name, credit_balance, email, contact, password, user_name, ca
 `
 
 type CreateUserParams struct {
-	FullName      sql.NullString `json:"full_name"`
-	CreditBalance float64        `json:"credit_balance"`
-	Email         string         `json:"email"`
-	Contact       sql.NullInt32  `json:"contact"`
-	Password      string         `json:"password"`
-	UserName      string         `json:"user_name"`
-	CardTier      sql.NullInt32  `json:"card_tier"`
+	FullName      string  `json:"full_name"`
+	CreditBalance float64 `json:"credit_balance"`
+	Email         string  `json:"email"`
+	Contact       int32   `json:"contact"`
+	Password      string  `json:"password"`
+	UserName      string  `json:"user_name"`
+	CardTier      int32   `json:"card_tier"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -108,7 +107,7 @@ SELECT id, full_name, credit_balance, email, contact, password, user_name, card_
 WHERE card_tier = $1
 `
 
-func (q *Queries) GetUserByUserCardTier(ctx context.Context, cardTier sql.NullInt32) ([]User, error) {
+func (q *Queries) GetUserByUserCardTier(ctx context.Context, cardTier int32) ([]User, error) {
 	rows, err := q.db.QueryContext(ctx, getUserByUserCardTier, cardTier)
 	if err != nil {
 		return nil, err
@@ -146,7 +145,7 @@ SELECT id, full_name, credit_balance, email, contact, password, user_name, card_
 WHERE contact = $1
 `
 
-func (q *Queries) GetUserByUserContact(ctx context.Context, contact sql.NullInt32) ([]User, error) {
+func (q *Queries) GetUserByUserContact(ctx context.Context, contact int32) ([]User, error) {
 	rows, err := q.db.QueryContext(ctx, getUserByUserContact, contact)
 	if err != nil {
 		return nil, err
@@ -306,14 +305,14 @@ WHERE id = $8
 `
 
 type UpdateUserParams struct {
-	FullName      sql.NullString `json:"full_name"`
-	CreditBalance float64        `json:"credit_balance"`
-	Email         string         `json:"email"`
-	Contact       sql.NullInt32  `json:"contact"`
-	Password      string         `json:"password"`
-	UserName      string         `json:"user_name"`
-	CardTier      sql.NullInt32  `json:"card_tier"`
-	ID            int64          `json:"id"`
+	FullName      string  `json:"full_name"`
+	CreditBalance float64 `json:"credit_balance"`
+	Email         string  `json:"email"`
+	Contact       int32   `json:"contact"`
+	Password      string  `json:"password"`
+	UserName      string  `json:"user_name"`
+	CardTier      int32   `json:"card_tier"`
+	ID            int64   `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
