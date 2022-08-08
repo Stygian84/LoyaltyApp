@@ -68,13 +68,14 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 		}
 
 		fmt.Println(promotion.CardTier + ' ' + user.CardTier)
+		if promotion.CardTier!=""{
 		if promotion.CardTier == user.CardTier {
 			tempReward = processReward(promotion, base)
 		} else {
-			tempReward = processReward(promotion, base)
+			continue
 
-		}
-
+		}}
+		tempReward = processReward(promotion, base)
 		if tempReward != 0 {
 			if tempReward > max {
 				max = tempReward
