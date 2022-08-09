@@ -8,32 +8,60 @@ import { useSession } from "next-auth/react";
 
 export default function Home() {
   const [promo, setPromo] = useState([]);
-  const [program, setProg]=useState({});
+  const [user, setUser]=useState({});
+
   const router = useRouter();
   axios.defaults.baseURL="http://localhost:8080"
   const {data:session}=useSession();
 
   //runs the function once when the page is loaded
+  const getUser = async () => {
+    try {
+      if (session) {
+        const response = await axios.get(
+          `/getUserbyEmail/${session.user.email}`
+        );
+        setUser(response.data[0]);
+      }
+    } catch (error) {
+      console.log(error);
+      // console.log("err", error.response.data.error);
+    }
 
-  const displayProgram = async () => {
-    const response1 = await axios.get("/listPromo");
-    setPromo(response1.data);
   };
 
-  const getProg=async ({progID})=>{
-    const response1 = await axios.get(`/GetLoyaltyId/${progID}`);
-    setProg(response1.data);
-  }
+  const displayProgram = async () => {
+    if (session) {
+     
+      getUser();
+      const response1 = await axios.get("/listPromo");
+      if(response1.data!=null){
+    
+        var plist=[];
+        for(var i=0;i<response1.data.length;i++){
+          console.log(i)
+          console.log(response1.data[i])
+          
+          if(response1.data[i].card_tier==user.card_tier){
+            plist.push(response1.data[i])
+          }
+        }
+          
+        setPromo(plist);
+     };
+    }
+    
+}
 
-  useEffect(() => {
+
+   useEffect(() => {
     if (router.isReady) {
       displayProgram();
-    
       
     }
 
     console.log(promo)
-  }, [router.isReady, session]);
+  }, [user.card_tier,router.isReady, session]);
 
   return (
     <Layout title={`Offers Page `}>

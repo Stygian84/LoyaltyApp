@@ -41,6 +41,7 @@ func NewServer(store *models.Store) *Server{
   router.POST("/createCardTier", server.CreateCardTier)
   router.POST("/createPromo",server.CreatePromo)
   router.GET("/listPromo", server.GetPromoList)
+  router.GET("/getPromoByDate/:progid", server.GetPromoCurrent)
   
   server.router=router
   return server

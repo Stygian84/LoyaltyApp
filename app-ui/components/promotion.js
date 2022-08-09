@@ -8,11 +8,17 @@ import { useSession } from "next-auth/react";
 export default function Promotion ({  promo }) {
     
     const [prog, setProg] = useState({});
+    const [user,setUser]=useState({});
+    const [validPromo, setValidPromo]=useState([]);
 
   const { data: session } = useSession();
   const getProg = async () => {
     try {
       if (session) {
+        const response1 = await axios.get(
+            `/getUserbyEmail/${session.user.email}`
+          );
+        setUser(response1.data[0]);
         const response = await axios.get(
           `/loyalty/${promo.program}`
         );
