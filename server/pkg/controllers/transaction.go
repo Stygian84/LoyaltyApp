@@ -43,6 +43,11 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 	if err != nil {
 		return 0, sql.NullInt32{Valid: false}, nil
 	}
+
+	if body.CreditToTransfer > user.CreditBalance {
+		return 0, sql.NullInt32{Valid: false}, nil
+	}
+
 	var base float64 = program.InitialEarnRate * body.CreditToTransfer
 	var promoIdUsed int32 = 0
 	var max float64 = base
@@ -66,13 +71,14 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 		}
 
 		fmt.Println(promotion.CardTier + ' ' + user.CardTier)
-		if promotion.CardTier!=0{
-		if promotion.CardTier == user.CardTier {
-			tempReward = processReward(promotion, base)
-		} else {
-			continue
+		if promotion.CardTier != 0 {
+			if promotion.CardTier == user.CardTier {
+				tempReward = processReward(promotion, base)
+			} else {
+				continue
 
-		}}
+			}
+		}
 		tempReward = processReward(promotion, base)
 		if tempReward != 0 {
 			if tempReward > max {
