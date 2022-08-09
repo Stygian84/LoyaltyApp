@@ -538,7 +538,7 @@ func TestMulOnGoingPromo(t *testing.T) {
 // Test for Credit to transfer > User Balance
 func TestTransferCreditMore(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 10000
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
