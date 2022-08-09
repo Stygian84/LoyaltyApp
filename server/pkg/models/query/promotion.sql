@@ -12,8 +12,7 @@ SELECT * FROM promotion
 WHERE $1 >= start_date AND $1 <= end_date AND program=$2;
 
 -- name: ListPromotion :many
-SELECT * FROM promotion
-ORDER BY program;
+SELECT * FROM promotion LEFT JOIN loyalty_program ON promotion.program= loyalty_program.id;
 
 -- name: CreatePromotion :one
 INSERT INTO promotion(

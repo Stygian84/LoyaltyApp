@@ -3,7 +3,7 @@ package main
 import (
 	"esc/ascendaRoyaltyPoint/pkg/config"
 	"esc/ascendaRoyaltyPoint/pkg/controllers"
-	_"esc/ascendaRoyaltyPoint/pkg/handle"
+	"esc/ascendaRoyaltyPoint/pkg/handle"
 	"esc/ascendaRoyaltyPoint/pkg/models"
 	"log"
 )
@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	// go handle.RunCron("09:54", "09:55")
+	go handle.RunCron("11:50", "11:51")
 
 	config.Connect()
 	db := config.GetDB()

@@ -51,7 +51,7 @@ import (
 func TestQueryTransactionStatusNoRequest(t *testing.T) {
 	var expected []models.CreditRequest
 	// create user and loyalty prog
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	createLoyaltyArgs := createLoyaltyObject()
 	_, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -69,7 +69,7 @@ func TestQueryTransactionStatusNoRequest(t *testing.T) {
 func TestQueryTransactionStatusMultipleRequest(t *testing.T) {
 	var expected []models.CreditRequest
 	// create user and loyalty prog
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	createLoyaltyArgs := createLoyaltyObject()
 
 	createLoyaltyArgs2 := createLoyaltyObject()

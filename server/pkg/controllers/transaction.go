@@ -54,7 +54,6 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 				PromoUsed: sql.NullInt32{Valid: true, Int32: int32(promotion.ID)},
 			}
 			request, err := query.GetCreditRequestByPromo(c, args)
-			fmt.Println(len(request))
 			if len(request) > 0 {
 				continue
 			}
@@ -62,7 +61,6 @@ func CalculateReward(c context.Context, query *models.Queries, body models.Trans
 
 			if err != nil {
 				fmt.Println(err)
-
 			}
 
 		}

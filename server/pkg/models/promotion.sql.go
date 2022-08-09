@@ -172,19 +172,40 @@ func (q *Queries) GetPromotionByProg(ctx context.Context, program int32) ([]Prom
 }
 
 const listPromotion = `-- name: ListPromotion :many
-SELECT id, program, promo_type, start_date, end_date, earn_rate_type, constant, card_tier, loyalty_membership FROM promotion
-ORDER BY program
+SELECT promotion.id, program, promo_type, start_date, end_date, earn_rate_type, constant, card_tier, loyalty_membership, loyalty_program.id, name, currency_name, processing_time, description, enrollment_link, terms_condition_link, format_regex, partner_code, initial_earn_rate FROM promotion LEFT JOIN loyalty_program ON promotion.program= loyalty_program.id
 `
 
-func (q *Queries) ListPromotion(ctx context.Context) ([]Promotion, error) {
+type ListPromotionRow struct {
+	ID                 int64            `json:"id"`
+	Program            int32            `json:"program"`
+	PromoType          PromoTypeEnum    `json:"promo_type"`
+	StartDate          time.Time        `json:"start_date"`
+	EndDate            time.Time        `json:"end_date"`
+	EarnRateType       EarnRateTypeEnum `json:"earn_rate_type"`
+	Constant           float64          `json:"constant"`
+	CardTier           int32            `json:"card_tier"`
+	LoyaltyMembership  sql.NullInt32    `json:"loyalty_membership"`
+	ID_2               sql.NullInt64    `json:"id_2"`
+	Name               sql.NullString   `json:"name"`
+	CurrencyName       sql.NullString   `json:"currency_name"`
+	ProcessingTime     sql.NullString   `json:"processing_time"`
+	Description        sql.NullString   `json:"description"`
+	EnrollmentLink     sql.NullString   `json:"enrollment_link"`
+	TermsConditionLink sql.NullString   `json:"terms_condition_link"`
+	FormatRegex        sql.NullString   `json:"format_regex"`
+	PartnerCode        sql.NullString   `json:"partner_code"`
+	InitialEarnRate    sql.NullFloat64  `json:"initial_earn_rate"`
+}
+
+func (q *Queries) ListPromotion(ctx context.Context) ([]ListPromotionRow, error) {
 	rows, err := q.db.QueryContext(ctx, listPromotion)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Promotion
+	var items []ListPromotionRow
 	for rows.Next() {
-		var i Promotion
+		var i ListPromotionRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Program,
@@ -195,6 +216,16 @@ func (q *Queries) ListPromotion(ctx context.Context) ([]Promotion, error) {
 			&i.Constant,
 			&i.CardTier,
 			&i.LoyaltyMembership,
+			&i.ID_2,
+			&i.Name,
+			&i.CurrencyName,
+			&i.ProcessingTime,
+			&i.Description,
+			&i.EnrollmentLink,
+			&i.TermsConditionLink,
+			&i.FormatRegex,
+			&i.PartnerCode,
+			&i.InitialEarnRate,
 		); err != nil {
 			return nil, err
 		}

@@ -25,12 +25,12 @@ func createLoyaltyObject() models.CreateLoyaltyParams {
 	}
 	return arg
 }
-func createUserObject(carTier sql.NullInt32) models.CreateUserParams {
+func createUserObject(carTier int32) models.CreateUserParams {
 	arg := models.CreateUserParams{
-		FullName:      sql.NullString{Valid: true, String: utils.RandomString(6)},
+		FullName:      utils.RandomString(6),
 		CreditBalance: 2000,
 		Email:         utils.RandomString(6),
-		Contact:       sql.NullInt32{Valid: false},
+		Contact:       int32(utils.RandomInt(80000000,90000000)),
 		Password:      utils.RandomString(10),
 		UserName:      utils.RandomString(5),
 		CardTier:      carTier,
@@ -62,7 +62,7 @@ func TestRewardCalPromoOutOfRange(t *testing.T) {
 	}
 	cardTier, err := testQueries.CreateCardTier(context.Background(), cardTierArgs)
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -87,7 +87,7 @@ func TestRewardCalPromoOutOfRange(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("add"),
 		Constant:     float64(constant),
-		CardTier:     sql.NullInt32{Valid: true, Int32: int32(cardTier.ID)},
+		CardTier:     int32(cardTier.ID),
 	}
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 	require.NoError(t, err)
@@ -106,7 +106,7 @@ func TestRewardCalCardTier(t *testing.T) {
 	}
 	cardTier, err := testQueries.CreateCardTier(context.Background(), cardTierArgs)
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -131,7 +131,7 @@ func TestRewardCalCardTier(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("add"),
 		Constant:     float64(constant),
-		CardTier:     sql.NullInt32{Valid: true, Int32: int32(cardTier.ID)},
+		CardTier:     int32(cardTier.ID),
 	}
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 	require.NoError(t, err)
@@ -146,7 +146,7 @@ func TestRewardCalCardTier(t *testing.T) {
 func TestRewardCalAddNoPromo(t *testing.T) {
 
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -167,7 +167,7 @@ func TestRewardCalAddNoPromo(t *testing.T) {
 
 func TestRewardCalNormal(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -192,6 +192,7 @@ func TestRewardCalNormal(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("add"),
 		Constant:     float64(constant),
+		CardTier:     int32(1),
 	}
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 	require.NoError(t, err)
@@ -205,7 +206,7 @@ func TestRewardCalNormal(t *testing.T) {
 // add with one time promo, when promo is not used
 func TestAddOneTimePromo(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -231,6 +232,7 @@ func TestAddOneTimePromo(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("add"),
 		Constant:     float64(constant),
+		CardTier:     int32(1),
 	}
 
 	createCreditRequestArgs := models.CreateCreditRequestParams{
@@ -249,14 +251,14 @@ func TestAddOneTimePromo(t *testing.T) {
 	require.NoError(t, err)
 	result, _, err := CalculateReward(context.Background(), testQueries, args)
 	require.NoError(t, err)
-	expected := creditToTransfer * (program.InitialEarnRate)
+	expected := creditToTransfer * (program.InitialEarnRate)+constant
 	require.Equal(t, expected, result)
 }
 
 // Test for Mul One Time Promotion with Previous Credit Request
 func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -281,8 +283,21 @@ func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("mul"),
 		Constant:     float64(constant),
+		CardTier:     int32(1),
 	}
-	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
+	promo, err := testQueries.CreatePromotion(context.Background(), createPromoArgs)
+	createCreditRequestArgs := models.CreateCreditRequestParams{
+		UserID:              int32(user.ID),
+		PromoUsed:           sql.NullInt32{Valid: true,Int32:int32(promo.ID)},
+		Program:             int32(program.ID),
+		MemberID:            utils.RandomString(20),
+		TransactionTime:     sql.NullTime{Valid: true, Time: startDate},
+		CreditUsed:          creditToTransfer,
+		RewardShouldReceive: utils.RandomFloat(30),
+		TransactionStatus:   models.TransactionStatusEnum("created"),
+	}
+	_, err = testQueries.CreateCreditRequest(context.Background(), createCreditRequestArgs)
+	require.NoError(t, err)
 	require.NoError(t, err)
 	result, _, err := CalculateReward(context.Background(), testQueries, args)
 	require.NoError(t, err)
@@ -293,7 +308,7 @@ func TestMulOneTimePromoWithCreditRequest(t *testing.T) {
 // test when there is multiple promotion going on, take the one with greatest return
 func TestMultiplePromotions(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -319,6 +334,7 @@ func TestMultiplePromotions(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("add"),
 		Constant:     float64(constant1),
+		CardTier:     int32(1),
 	}
 
 	var constant2 float64 = 200
@@ -329,6 +345,7 @@ func TestMultiplePromotions(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("mul"),
 		Constant:     float64(constant2),
+		CardTier:     int32(1),
 	}
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs1)
 	require.NoError(t, err)
@@ -398,7 +415,7 @@ func TestMulRequireCardTierMatch(t *testing.T) {
 	require.NoError(t, err)
 
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Int32: int32(card_tier.ID), Valid: true})
+	createUserArgs := createUserObject(int32(card_tier.ID))
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -424,7 +441,7 @@ func TestMulRequireCardTierMatch(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("mul"),
 		Constant:     float64(constant),
-		CardTier:     (sql.NullInt32{Int32: int32(card_tier.ID), Valid: true}),
+		CardTier:     int32(card_tier.ID),
 	}
 
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
@@ -445,7 +462,7 @@ func TestAddCardTier(t *testing.T) {
 	require.NoError(t, err)
 
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: true, Int32: int32(cardTier.ID)})
+	createUserArgs := createUserObject(int32(cardTier.ID))
 
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
@@ -470,7 +487,7 @@ func TestAddCardTier(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("add"),
 		Constant:     float64(constant),
-		CardTier:     sql.NullInt32{Valid: true, Int32: int32(cardTier.ID)},
+		CardTier:     int32(cardTier.ID),
 	}
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 	require.NoError(t, err)
@@ -483,7 +500,7 @@ func TestAddCardTier(t *testing.T) {
 // Test for Mul Ongoing Promotion
 func TestMulOnGoingPromo(t *testing.T) {
 	createLoyaltyArgs := createLoyaltyObject()
-	createUserArgs := createUserObject(sql.NullInt32{Valid: false})
+	createUserArgs := createUserObject(1)
 	var creditToTransfer float64 = 100
 	program, err := testQueries.CreateLoyalty(context.Background(), createLoyaltyArgs)
 	require.NoError(t, err)
@@ -508,6 +525,7 @@ func TestMulOnGoingPromo(t *testing.T) {
 		EndDate:      endDate,
 		EarnRateType: models.EarnRateTypeEnum("mul"),
 		Constant:     float64(constant),
+		CardTier:     int32(1),
 	}
 	_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 	require.NoError(t, err)

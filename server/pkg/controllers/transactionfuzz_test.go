@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"crypto/rand"
-	"database/sql"
 	"esc/ascendaRoyaltyPoint/pkg/models"
 	"esc/ascendaRoyaltyPoint/pkg/utils"
 	"fmt"
@@ -16,13 +15,13 @@ import (
 
 func createUserObjectFuzz(email string, name string) models.CreateUserParams {
 	arg := models.CreateUserParams{
-		FullName:      sql.NullString{Valid: true, String: name},
+		FullName:      name,
 		CreditBalance: 2000,
 		Email:         email,
-		Contact:       sql.NullInt32{Valid: false},
+		Contact:       int32(utils.RandomInt(80000000,90000000)),
 		Password:      utils.RandomString(10),
 		UserName:      name,
-		CardTier:      sql.NullInt32{Valid: false},
+		CardTier:      1,
 	}
 	return arg
 }
@@ -49,6 +48,7 @@ func FuzzCalRewards(f *testing.F) {
 			EndDate:      endDate,
 			EarnRateType: models.EarnRateTypeEnum("mul"),
 			Constant:     float64(constant),
+			CardTier:     int32(1),
 		}
 
 		promotion, err := testQueries.CreatePromotion(context.Background(), createPromoArgs)
@@ -96,6 +96,7 @@ func FuzzMulOnGoingPromo(f *testing.F) {
 			EndDate:      endDate,
 			EarnRateType: models.EarnRateTypeEnum("add"),
 			Constant:     float64(constant),
+			CardTier:     int32(1),
 		}
 		_, err = testQueries.CreatePromotion(context.Background(), createPromoArgs)
 		require.NoError(t, err)
