@@ -20,6 +20,7 @@ const (
 	email_pw = "mvmeztlcrqqclfxc"
 )
 
+// Read Handback files directly from the sftp server. Update the transaction status in the DB. Notify user through email.
 func ReadHandbackFile() (err error) {
 	config.Connect()
 	Queries = models.New(config.GetDB())
@@ -32,13 +33,14 @@ func ReadHandbackFile() (err error) {
 	}
 
 	log.Printf("Found Files in ./handback Files")
+
 	// Output each file name and size in bytes
 	log.Printf("%19s %12s %s", "MOD TIME", "SIZE", "NAME")
 	for _, theFile := range theFiles {
 		log.Printf("%19s %12s %s", theFile.ModTime, theFile.Size, theFile.Name)
 	}
 
-	// Show content
+	// Iterate through all files in handback folder and read the content of each file
 	for _, theFile := range theFiles {
 
 		remoteFile := "./handback/" + theFile.Name
@@ -53,6 +55,7 @@ func ReadHandbackFile() (err error) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		// column title = records [0]
 		// transfer_date := records [1][2]
 		// amount := records [2][2]
@@ -107,7 +110,6 @@ func ReadHandbackFile() (err error) {
 			log.Printf("Reference Number %v Is Successfully Rejected", reference_number)
 
 			// Refunded credit used since transaction was rejected
-
 			credit_used := credit_details.CreditUsed
 			log.Printf("%.2f credits are refunded to USERID %v", credit_used, user_id)
 			balanceargs := models.IncrBalanceParams{
@@ -119,13 +121,14 @@ func ReadHandbackFile() (err error) {
 				log.Fatal(err)
 			}
 
-			//Notify user through email
+			// Notify user through email
 			err = sendEmail(email_to, false, user_details.UserName, reference_number, user_id, user_details.CreditBalance, credit_details.CreditUsed, "Rejected")
 			if err != nil {
 				log.Printf("Email for %s with USERID %v cannot be reached \n", user_details.UserName, user_id)
 			}
 
 		}
+
 	}
 
 	log.Println("Disconnecting from SFTP server ...")
@@ -136,7 +139,7 @@ func ReadHandbackFile() (err error) {
 
 }
 
-// Approved = true if approved
+// Send Email to "email_to" email. Approved = true if transaction is approved
 func sendEmail(email_to string, approved bool, user_name string, reference_number string, user_id int32, user_balance float64, credit_used float64, status string) (err error) {
 	from := email
 	password := email_pw
@@ -150,6 +153,7 @@ func sendEmail(email_to string, approved bool, user_name string, reference_numbe
 
 	var subject string
 	var body string
+
 	if approved {
 		subject = "Subject: Your transaction has been approved\n"
 		body = fmt.Sprintf("Dear %v , \n\nYour transaction with reference number %v has been approved. \n\n"+

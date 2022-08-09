@@ -38,6 +38,7 @@ func UploadAccrual(localtempDir string, remoteDir string) {
 
 	for _, theFile := range theFiles {
 		conn, sc := ConnectToSFTP()
+
 		// Upload local file to remote file
 		remoteFile := remoteDir + fmt.Sprint(theFile.Name())
 		localFile := localtempDir + fmt.Sprint(theFile.Name())
@@ -62,6 +63,7 @@ type remoteFiles struct {
 	ModTime string
 }
 
+// To list all files in the remoteDir
 func listFiles(sc sftp.Client, remoteDir string) (theFiles []remoteFiles, err error) {
 
 	files, err := sc.ReadDir(remoteDir)
@@ -92,7 +94,7 @@ func listFiles(sc sftp.Client, remoteDir string) (theFiles []remoteFiles, err er
 	return theFiles, nil
 }
 
-// Upload file to sftp server
+// Upload a file to sftp server
 func uploadFile(sc sftp.Client, localFile, remoteFile string) (err error) {
 	log.Printf("Uploading [%s] to [%s] ...", localFile, remoteFile)
 
@@ -119,14 +121,13 @@ func uploadFile(sc sftp.Client, localFile, remoteFile string) (err error) {
 	if err != nil {
 		return fmt.Errorf("Unable to upload local file: %v", err)
 	}
-	_ = bytes // to avoid declared and not used error
-	//log.Printf("%d bytes copied", bytes)
+	_ = bytes
 	dstFile.Close()
 	srcFile.Close()
 	return nil
 }
 
-// Download file from sftp server
+// Download a file from sftp server
 func downloadFile(sc sftp.Client, remoteFile, localFile string) (err error) {
 
 	log.Printf("Downloading [%s] to [%s] ...\n", remoteFile, localFile)
@@ -148,11 +149,11 @@ func downloadFile(sc sftp.Client, remoteFile, localFile string) (err error) {
 		return fmt.Errorf("unable to download remote file: %v", err)
 	}
 	_ = bytes
-	//log.Printf("%d bytes copied to %v", bytes, dstFile)
 
 	return nil
 }
 
+// To connect to a SFTP server
 func ConnectToSFTP() (*ssh.Client, *sftp.Client) {
 	// Create a url
 	rawurl := fmt.Sprintf("sftp://%v:%v@%v", sftpUser, sftpPass, sftpHost)
@@ -169,8 +170,6 @@ func ConnectToSFTP() (*ssh.Client, *sftp.Client) {
 
 	// Parse Host and Port
 	host := parsedUrl.Host
-
-	//log.Printf("Connecting to %s ...\n", host)
 
 	var auths []ssh.AuthMethod
 
@@ -196,14 +195,11 @@ func ConnectToSFTP() (*ssh.Client, *sftp.Client) {
 		log.Fatalf("Failed to connect to host [%s]: %v", addr, err)
 	}
 
-	//defer conn.Close()
-
 	// Create new SFTP client
 	sc, err := sftp.NewClient(conn)
 	if err != nil {
 		log.Fatalf("Unable to start SFTP subsystem: %v", err)
 	}
-	//defer sc.Close()
 
 	return conn, sc
 }
