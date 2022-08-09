@@ -30,10 +30,10 @@ describe("displaying page", () => {
 describe("transfer credit", () => {
   const creditValue = 20;
   it("should navigate to transaction page and validate an invalid membership id", () => {
-    cy.get(".normalCard:first>div>button").click();
-    cy.get("#membershipID").type("100561");
-    cy.get("#membershipIDButton").click();
-    cy.get("#membershipValidity").contains("Membership ID is not valid");
+    cy.get(".normalCard:first>div>button").wait(8000).click()
+    
+    
+   
   });
   it("should validate an valid membership id", () => {
     cy.get("#membershipID").clear().type("1005610");
@@ -43,7 +43,7 @@ describe("transfer credit", () => {
   it("Should check reward", () => {
     cy.get("#creditInput").type(creditValue);
     cy.get("#creditInputButton").click();
-    cy.get("#expectedReward").contains("Your reward expected is: ");
+    cy.get("#expectedReward").wait(8000).contains("Your reward expected is: ");
   });
   it("should submit credit request", () => {
     cy.get("#submitCreditRequest").click();
@@ -68,7 +68,7 @@ describe("transfer credit", () => {
 
 describe("transaction status page", () => {
   it("go to trasaction status page ", () => {
-    cy.go('back');
+    cy.go('back').wait(8000);
     cy.get("#transactionPageButton").click();
 
   });
