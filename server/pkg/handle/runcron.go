@@ -6,7 +6,7 @@ import (
 	"github.com/go-co-op/gocron"
 )
 
-// The time is in 24 hrs format
+// The time is in 24 hrs format. AccrualTime is the time to send accrual data to sftp server, while HandbackTime is the time to receive handback file from sftp server.
 func RunCron(AccrualTime string, HandbackTime string) {
 	s1 := gocron.NewScheduler(time.Local)
 	s1.Every(1).Day().At(AccrualTime).Do(SendAccrual)

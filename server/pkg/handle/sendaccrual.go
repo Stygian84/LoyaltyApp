@@ -25,50 +25,54 @@ func SendAccrual() (err error) {
 		}
 	}
 
-	//index, memberID, member fullname, transfer date, amount, reference no, partnercode
-
 	credit_request_list, err := Queries.ListCreditRequestByStatus(context.Background(), models.TransactionStatusEnumCreated)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// key should be partnercode , value = program id
-	program_dict := make(map[int32]int)
+
+	// Dictionary key is partnercode, value is credit req reference number
+	program_dict := make(map[string][]int)
 
 	for _, credit_request := range credit_request_list {
+
+		// Look for partnercode for each program id
 		program_id := credit_request.Program
+		program_details, err := Queries.GetLoyaltyByID(context.Background(), int64(program_id))
+		partner_code := program_details.PartnerCode
+
+		credit_request_reference_number := credit_request.ReferenceNumber
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		if _, ok := program_dict[program_id]; ok {
-			continue
-		} else {
-			program_dict[program_id] = 0
-		}
+		program_dict[partner_code] = append(program_dict[partner_code], int(credit_request_reference_number))
 	}
-	// program_details,err := Queries.GetLoyaltyByID(context.Background(),int64(program_id))
-	//key is program_code
+
+	// Key = partnercode , element = reference number
+	// 1st loop : Iterate through each partnercode, to get relevant reference number
+	// 2nd loop : Iterate through each reference number and append the index + content to a csv file
 	for key, element := range program_dict {
 		_ = element
-		//update file name to include date later
-		file_name := strconv.FormatInt(int64(key), 10)
-		csvFile, err := os.Create("./temp/" + file_name + "_" + time.Now().Format("2006-01-02") + ".csv")
+
+		// Create a csv file whose file name is based on a partnercode
+		partner_code := key
+		csvFile, err := os.Create("./temp/" + partner_code + "_" + time.Now().Format("2006-01-02") + ".csv")
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Create the first row of the csv file
 		csvwriter := csv.NewWriter(csvFile)
 		tempData := [][]string{
 			{"Index", "Member ID", "Member FullName", "Transfer Date", "Amount", "Reference Number", "PartnerCode"},
 		}
 
-		credit_request_ls, err := Queries.GetCreditRequestByProg(context.Background(), key)
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		idx := 1
-		for _, credit_request_details := range credit_request_ls {
+		for _, reference_number := range element {
+			credit_request_details, err := Queries.GetCreditRequestByID(context.Background(), int64(reference_number))
+			if err != nil {
+				log.Print(err)
+			}
+
 			rowList := []string{}
 
 			user_id := credit_request_details.UserID
@@ -78,11 +82,8 @@ func SendAccrual() (err error) {
 			full_name := user_details.FullName
 			transfer_date := time.Now().Format("2006-01-02")
 			reference_number := credit_request_details.ReferenceNumber
-			// program_id := credit_request_details.Program
-			// //search program by program id sql
-			// partner_code := progra
 
-			rowList = append(rowList, strconv.FormatInt(int64(idx), 10), member_id, full_name, transfer_date, strconv.FormatInt(int64(credit_used), 10), strconv.FormatInt(int64(reference_number), 10), file_name)
+			rowList = append(rowList, strconv.FormatInt(int64(idx), 10), member_id, full_name, transfer_date, strconv.FormatInt(int64(credit_used), 10), strconv.FormatInt(int64(reference_number), 10), partner_code)
 			idx += 1
 			tempData = append(tempData, rowList)
 
@@ -92,6 +93,7 @@ func SendAccrual() (err error) {
 				ReferenceNumber:   int64(reference_number),
 			}
 			_ = Queries.UpdateTransactionStatusByID(context.Background(), args)
+
 		}
 
 		for _, tempRow := range tempData {
@@ -103,13 +105,16 @@ func SendAccrual() (err error) {
 	}
 
 	// Upload csv files to sftp server
-	UploadAccrual("./temp/", "./accrual/")
+	UploadAccrual("./temp/", "./accrual")
+
+	// For demo purposes the temp folder does not get deleted
 
 	// Delete temp folder containing newly created csv file for transfer
-	err = os.RemoveAll("./temp")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = os.RemoveAll("./temp")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
 	log.Print("Disconnecting from sftp server ...")
 	return err
 }
