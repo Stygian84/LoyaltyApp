@@ -16,6 +16,7 @@ export default function Layout({ title, children }) {
             <Link href="/homepage">
               <a className="text-lg font-bold text-white">Transfer Connect </a>
             </Link>
+            <Link href="/"><a className="text-white font-bold">Sign out</a></Link>
           </nav>
         </header>
 

@@ -4,44 +4,58 @@ import Image from "next/dist/client/image";
 import LabelContent from "../components/labelContent";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { dateTime } from 'Luxon'
 
 export default function Promotion ({  promo }) {
     
     const [prog, setProg] = useState({});
-    const [user,setUser]=useState({});
-    const [validPromo, setValidPromo]=useState([]);
+    
+    axios.defaults.baseURL="http://localhost:8080"
 
   const { data: session } = useSession();
   const getProg = async () => {
     try {
       if (session) {
-        const response1 = await axios.get(
-            `/getUserbyEmail/${session.user.email}`
-          );
-        setUser(response1.data[0]);
+        
         const response = await axios.get(
           `/loyalty/${promo.program}`
         );
-        setProg(response.data);
+        if(response.data.initial_earn_rate!=null){
+            console.log(prog.initial_earn_rate==null)
+            setProg(response.data);
+        }
       }
     } catch (error) {
       console.log(error);
       // console.log("err", error.response.data.error);
     }
   };
+
+  
   useEffect(() => {
+    
     getProg();
-  }, [session]);
+  }, [session, prog.initial_earn_rate]);
 
 
     switch(promo.earn_rate_type){
         case "add":
             //getProg(promo.program)
-            var earnRate = prog.initial_earn_rate+promo.constant;
+            var earnRate=0;
+            if(prog.initial_earn_rate!=null){
+                
+
+                earnRate = prog.initial_earn_rate;
+                var offerInfo="extra";
+            }
             break;
         case "mul":
             //getProg(promo.program)
-            var earnRate = prog.initial_earn_rate*promo.constant;
+            var earnRate=0;
+            if(prog.initial_earn_rate!=null){
+                earnRate = prog.initial_earn_rate*promo.constant;
+                var offerInfo="X";
+            }
             break;
     }
 
@@ -68,10 +82,10 @@ export default function Promotion ({  promo }) {
             height="100%"
             >
             </Image> */}
-            <p className="text-white font-thin">{earnRate}</p>
+            
 
             <div className="flex flex-col items-center justify center p-5">
-                
+             <p className=" text-pink font-bold text-lg mb-4">{promo.constant} {offerInfo} points offered!</p>
                 <LabelContent title="Program Name">
                     <h2 className="text-lg">{prog.name}</h2>
                 </LabelContent>

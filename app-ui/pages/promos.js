@@ -39,8 +39,7 @@ export default function Home() {
     
         var plist=[];
         for(var i=0;i<response1.data.length;i++){
-          console.log(i)
-          console.log(response1.data[i])
+          
           
           if(response1.data[i].card_tier==user.card_tier){
             plist.push(response1.data[i])

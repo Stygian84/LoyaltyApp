@@ -47,10 +47,12 @@ export default function LoginScreen() {
 
   if (session) {
     return (
-      <>
-        Signed in as {session.user.name} <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </>
+      <Layout>
+        <div className="flex flex-col mt-10  items-center justify center p-5 ">
+        <p className="mb-4 text-lg font-bold">Confirm Sign out?</p>
+        <button className=" text-white rounded bg-blue-700 p-4" onClick={() => signOut()}>Sign out</button>
+        </div>
+      </Layout>
     );
   } else {
     return (

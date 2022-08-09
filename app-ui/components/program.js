@@ -81,7 +81,7 @@ const Program = ({ program }) => {
         break;
     case "mul":
         //getProg(promo.program)
-        var earnRate = "x"
+        var earnRate = "X"
         break;
 }
 
@@ -99,9 +99,10 @@ const Program = ({ program }) => {
             </Image> */}
             
             <div className="flex flex-col items-center justify center p-5">  
+            
             <div className=" flex flex-col items-center justify center mb-4">
-                <p className="font-bold center font-si ">OFFER! </p>
-                <p>{promo.constant} {earnRate} points offered</p>
+                <p className="font-bold center text-lg ">OFFER! </p>
+                <p className="text-lg text-center"><span className="text-xl">{promo.constant.toFixed(2)}</span> <span className='font-bold text-red-500'>{earnRate}</span> points offered</p>
             </div>
 
                 <LabelContent title="Program Name">

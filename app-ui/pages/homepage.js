@@ -27,8 +27,8 @@ export default function Home() {
     <Layout title={`Home Page `}>
       <Nav />
       <Link href={`/promos`}>
-          <button className=" h-12  font-bold mt-10  text-lg cursor-pointer bg-blue-300 rounded drop-shadow-sm px-4 ">
-              <p>Offers</p>
+          <button className=" h-12  font-bold mt-6 ml-4 mb-4  text-lg cursor-pointer bg-yellow-300 rounded drop-shadow-sm px-4 ">
+              <p> View Offers Here</p>
           </button>
       </Link>
       

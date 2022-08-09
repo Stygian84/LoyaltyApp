@@ -17,6 +17,10 @@ const ProgramSection = ({ program }) => {
       <LabelContent title="Program Description">
         <h3 className="text-xl">{program.description}</h3>
       </LabelContent>
+      <LabelContent title="Points to Rewards">
+        <h3 className=""> 1 point : {program.initial_earn_rate.toFixed(2)}{" "}
+                        {program.currency_name}</h3>
+      </LabelContent>
       <LabelContent title="Partner Code">
         <p>{program.partner_code}</p>
       </LabelContent>
