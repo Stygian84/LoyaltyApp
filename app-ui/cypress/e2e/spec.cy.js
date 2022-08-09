@@ -6,13 +6,17 @@ describe("displaying page", () => {
     cy.get("#password").type("password");
     cy.get("#loginButton").click();
 
-    cy.get(".card").each(($el, index, $list) => {
+    cy.get(".offerCard").each(($el,index,$list)=>{
+      cy.wrap($el).children().children().should("have.length",6)
+    })
+
+    cy.get(".normalCard").each(($el, index, $list) => {
       cy.wrap($el).children().children().should("have.length", 5);
     });
   });
   it("should contain a transfer credit button", () => {
     // cy.visit("http://localhost:3000");
-    cy.get(".card").each(($el, index, $list) => {
+    cy.get(".normalCard").each(($el, index, $list) => {
       cy.wrap($el).get("div> div>button").contains("Transfer credits");
     });
   });
@@ -26,7 +30,7 @@ describe("displaying page", () => {
 describe("transfer credit", () => {
   const creditValue = 20;
   it("should navigate to transaction page and validate an invalid membership id", () => {
-    cy.get(".card:first>div>button").click();
+    cy.get(".normalCard:first>div>button").click();
     cy.get("#membershipID").type("100561");
     cy.get("#membershipIDButton").click();
     cy.get("#membershipValidity").contains("Membership ID is not valid");

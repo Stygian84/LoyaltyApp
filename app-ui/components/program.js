@@ -88,7 +88,7 @@ const Program = ({ program }) => {
   if(offer){
     return (
 
-        <div className="card rounded shadow flex flex-col items-center justify center p-5 border-4  border-yellow-500">
+        <div  className="offerCard card rounded shadow flex flex-col items-center justify center p-5 border-4  border-yellow-500">
             {/* <Image 
             src= {program.image}
             alt={program.description}
@@ -130,7 +130,7 @@ const Program = ({ program }) => {
     );
 } else{
     return(
-        <div className="card rounded shadow flex flex-col items-center justify center p-5  border">
+        <div className="normalCard card rounded shadow flex flex-col items-center justify center p-5  border">
             {/* <Image 
             src= {program.image}
             alt={program.description}
