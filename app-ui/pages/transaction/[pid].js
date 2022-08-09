@@ -18,8 +18,11 @@ const ProgramSection = ({ program }) => {
         <h3 className="text-xl">{program.description}</h3>
       </LabelContent>
       <LabelContent title="Points to Rewards">
-        <h3 className=""> 1 point : {program.initial_earn_rate.toFixed(2)}{" "}
-                        {program.currency_name}</h3>
+        <h3 className="">
+          {" "}
+          1 point : {program.initial_earn_rate.toFixed(2)}{" "}
+          {program.currency_name}
+        </h3>
       </LabelContent>
       <LabelContent title="Partner Code">
         <p>{program.partner_code}</p>
@@ -42,7 +45,7 @@ const RenderCreditRequest = ({ referenceDoc }) => {
 
 const Transaction = () => {
   const { data: session } = useSession();
-  const [program, setProgram] = useState({});
+  const [program, setProgram] = useState(null);
   const [creditToUse, setCreditToUse] = useState(0);
   const [rewardExpected, setRewardExpected] = useState(0);
   const [membershipID, setMembershipID] = useState(0);
@@ -80,28 +83,27 @@ const Transaction = () => {
   }, [router.isReady, session]);
 
   const initateTransaction = async () => {
-    checkReward();
-    if(rewardExpected==0){
-      setErrorResponse('You do not have sufficient credits to initiate this transaction')
+    await checkReward();
+    if (user.credit_balance < creditToUse) {
+      setErrorResponse(
+        "You do not have sufficient credits to initiate this transaction"
+      );
+    } else {
+      try {
+        const data = {
+          userId: user.id,
+          creditToTransfer: parseFloat(creditToUse),
+          membershipId: membershipID,
+          programId: program.id,
+        };
+        const response = await axios.post("/initTransaction", (data = data));
+        setReferenceDoc(response.data);
+      } catch (error) {
+        console.log("err", error.response.data.error);
+        setReferenceDoc(null);
+        setErrorResponse(error.response.data.error);
+      }
     }
-    else{
-
-    
-    try {
-      const data = {
-        userId: user.id,
-        creditToTransfer: parseFloat(creditToUse),
-        membershipId: membershipID,
-        programId: program.id,
-      };
-      const response = await axios.post("/initTransaction", (data = data));
-      setReferenceDoc(response.data);
-    } catch (error) {
-      console.log("err", error.response.data.error);
-      setReferenceDoc(null);
-      setErrorResponse(error.response.data.error);
-    }
-  }
   };
   const validateMembership = async () => {
     try {
@@ -125,7 +127,9 @@ const Transaction = () => {
   };
   const checkReward = async () => {
     if (user.credit_balance < creditToUse) {
-      setRewardExpected(0);
+      setErrorResponse(
+        "You do not have sufficient credits to initiate this transaction"
+      );
     } else {
       try {
         const data = {
@@ -154,7 +158,7 @@ const Transaction = () => {
         <div className="flex flex-col items-center justify-center border-2 rounded-xl px-20 py-40 border-black">
           <h1 className="font-bold text-4xl mb-6">Transaction Page</h1>
 
-          <ProgramSection program={program} />
+          {program && <ProgramSection program={program} />}
           <LabelContent title={"Enter Membership ID"}>
             <div>
               {" "}
