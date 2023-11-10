@@ -1,0 +1,8 @@
+version: "1"
+packages:
+  - path: "./pkg/models"
+    name: "models"
+    engine: "postgresql"
+    schema: "./pkg/models/migrations"
+    queries: "./pkg/models/query"
+    emit_json_tags: true
